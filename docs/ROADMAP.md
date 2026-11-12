@@ -80,6 +80,7 @@ Landed (v0.3.0):
   binary cross-ISA→lift-to-IR/DBT DEGRADED, WASM→runtime, iOS-policy→impossible)
 - `poa.scan_dependencies` — ELF (readelf/DT_NEEDED), PE (objdump/DLL imports),
   WASM (import-section scan); Mach-O → honest unsupported, never faked
+- `shim/` v0.1.0 — poa-shim: path/mkstemp/monotonic-time/errno↔GetLastError, compliance-tested
 - `docs/SHIM.md` — POSIX↔Win32 compliance matrix, 18 mappings, fork() absence
   flagged as top failure mode; lossy mappings must be declared in the port report
 - CI: Ubuntu + Windows + macOS build + stdio smoke (`.github/workflows/ci.yml`)

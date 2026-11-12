@@ -24,3 +24,16 @@ jobs:
       - name: stdio smoke test
         shell: bash
         run: POA_INSPECT=$(node -e "process.stdout.write(process.execPath)") node scripts/smoke.mjs
+
+  shim:
+    name: poa-shim build + compliance test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: build and run poa-shim tests
+        shell: bash
+        run: cc -Wall -Wextra -std=c11 shim/poa_shim.c shim/poa_shim_test.c -o poa-shim-test && ./poa-shim-test

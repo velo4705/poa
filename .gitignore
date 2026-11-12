@@ -2,3 +2,4 @@ node_modules/
 dist/
 *.log
 .poa/
+poa-shim-test*
