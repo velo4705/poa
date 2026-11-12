@@ -155,7 +155,9 @@ async function findElfArtifacts(dir: string, max = 20): Promise<Array<{ path: st
         const magic = Buffer.alloc(4);
         await fh.read(magic, 0, 4, 0);
         await fh.close();
-        if (magic.readUInt32LE(0) === 0x464c457f || magic.toString("latin1") === "MZ") {
+        const isElf = magic.readUInt32LE(0) === 0x464c457f;
+        const isPe = magic[0] === 0x4d && magic[1] === 0x5a; // "MZ"
+        if (isElf || isPe) {
           const m = await ingest(p);
           out.push({ path: p, arch: m.arch });
         }
@@ -197,21 +199,41 @@ export async function buildPort(
   const buildDir = path.resolve(cwd, opts.buildDir ?? path.join(".poa", "build", session.id));
   await fs.mkdir(buildDir, { recursive: true });
 
-  // CMake path (preferred, best cross support)
-  const hasCMakeLists = await fs
-    .access(path.join(source, "CMakeLists.txt"))
-    .then(() => true)
-    .catch(() => false);
+  // CMake path (preferred, best cross support). POA_CMAKE_SOURCE wins if set;
+  // then the root, then the usual embedded-build locations (zstd: ./build/cmake).
+  const CMAKE_CANDIDATE_DIRS = ["", "build/cmake", "cmake", "CMake", "build"];
+  const envOverride = process.env.POA_CMAKE_SOURCE;
+  let cmakeSrc: string | null = null;
+  if (envOverride) {
+    const p = path.resolve(cwd, envOverride);
+    if (await fs.access(path.join(p, "CMakeLists.txt")).then(() => true, () => false)) {
+      cmakeSrc = p;
+    } else {
+      return {
+        ok: false,
+        stage: "build",
+        detail: `POA_CMAKE_SOURCE=${envOverride} has no CMakeLists.txt`,
+        blocker: { what: "bad POA_CMAKE_SOURCE", why: `${p}/CMakeLists.txt not found`, ask: "point POA_CMAKE_SOURCE at a directory containing CMakeLists.txt" },
+      };
+    }
+  }
+  for (const d of cmakeSrc ? [] : CMAKE_CANDIDATE_DIRS) {
+    const p = path.join(source, d);
+    if (await fs.access(path.join(p, "CMakeLists.txt")).then(() => true, () => false)) {
+      cmakeSrc = p;
+      break;
+    }
+  }
 
-  if (!hasCMakeLists) {
+  if (!cmakeSrc) {
     return {
       ok: false,
       stage: "build",
-      detail: "no CMakeLists.txt at source root",
+      detail: "no CMakeLists.txt found",
       blocker: {
         what: "unsupported build system (yet)",
-        why: "M1 implements CMake orchestration; meson/autotools/make are detected but not driven yet",
-        ask: "add a CMakeLists.txt, or implement meson/autotools driver next",
+        why: `no CMakeLists.txt at source root or in the usual embedded locations [${CMAKE_CANDIDATE_DIRS.map((d) => d || ".").join(", ")}]; meson/autotools/make are detected but not driven yet`,
+        ask: "add a CMakeLists.txt (or POA_CMAKE_SOURCE override), or reimplements meson driver next",
       },
     };
   }
@@ -230,7 +252,7 @@ export async function buildPort(
     };
   }
 
-  let configureArgs = ["-S", source, "-B", buildDir];
+  let configureArgs = ["-S", cmakeSrc, "-B", buildDir];
   const envToolchainFile = process.env.POA_CMAKE_TOOLCHAIN_FILE;
   if (effectiveMode === "cross") {
     if (envToolchainFile) {

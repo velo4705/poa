@@ -38,6 +38,40 @@ jobs:
         shell: bash
         run: cc -Wall -Wextra -std=c11 shim/poa_shim.c shim/poa_shim_test.c -o poa-shim-test && ./poa-shim-test
 
+  zstd-poa:
+    name: zstd via POA compat-shim (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # windows-latest: native build, then the exe actually runs there
+        # ubuntu-latest: cross-built for x86_64-windows-gnu, PE magic checked
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja (ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build
+      - name: install cmake, ninja (windows)
+        if: runner.os == 'Windows'
+        run: choco install cmake ninja -y
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone zstd v1.5.7 (BSD)
+        shell: bash
+        run: git clone --depth 1 --branch v1.5.7 https://github.com/facebook/zstd.git "$GITHUB_WORKSPACE/zstd"
+      - name: compat-shim build via poa
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export ZSTD_SRC="$GITHUB_WORKSPACE/zstd"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-zstd-work"
+          node scripts/m2-compat-zstd.mjs
+
   sqlite-native:
     name: sqlite3 shell — native build + run (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
