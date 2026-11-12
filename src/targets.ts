@@ -93,6 +93,17 @@ export const TARGETS: readonly TargetProfile[] = [
     binFormats: ["pe", "wasm"],
   },
   {
+    id: "macos-aarch64",
+    description: "macOS on Apple silicon (Mach-O arm64, Metal)",
+    arch: "aarch64",
+    os: "darwin",
+    ramMb: 16384,
+    gpu: { kind: "hardware", api: "metal" },
+    inputs: ["keyboard", "mouse", "gamepad", "trackpad"],
+    display: "native",
+    binFormats: ["macho", "wasm"],
+  },
+  {
     id: "tv-smarttv-generic",
     description: "Generic smart TV (Tizen/webOS class), 10-foot UI, remote input",
     arch: "aarch64",

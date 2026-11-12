@@ -239,6 +239,27 @@ export async function ingest(inputPath: string): Promise<PortManifest> {
         unknowns: [],
       };
     }
+    // Plain C/C++ source with no build system at the root (e.g. the SQLite amalgamation)
+    try {
+      const names = await fs.readdir(abs);
+      const cFiles = names.filter((f) => /\.(c|cc|cxx|cpp|s|S)$/.test(f));
+      if (cFiles.length > 0) {
+        return {
+          input: abs,
+          kind: "source",
+          format: `source tree (${cFiles.length} C/C++ file(s), no build system: ${cFiles.slice(0, 3).join(", ")}${cFiles.length > 3 ? ", …" : ""})`,
+          arch: "unknown",
+          bits: null,
+          endianness: null,
+          platformHint: null,
+          sizeBytes: 0,
+          confidence: 0.75,
+          unknowns: ["build system detection — no CMakeLists/meson/etc; external wrapper may provide it"],
+        };
+      }
+    } catch {
+      /* unreadable — fall through to unknown */
+    }
     return {
       input: abs,
       kind: "unknown",
