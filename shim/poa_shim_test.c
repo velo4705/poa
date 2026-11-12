@@ -73,18 +73,18 @@ int main(void)
     CHECK("errno_to_win32_identity[EINVAL]", poa_errno_to_win32(EINVAL) == EINVAL);
 #endif
 
-    /* item 9: dlopen/dlsym of the system C runtime */
+    /* item 9: dlopen/dlsym of the system C runtime — library name is platform-specific */
 #if defined(_WIN32)
-    void *crt = poa_dlopen("msvcrt.dll", 0);
-    CHECK("dlopen_crt", crt != NULL);
-    CHECK("dlsym_printf", crt && poa_dlsym(crt, "printf") != NULL);
-    CHECK("dlclose_ok", crt && poa_dlclose(crt) == 0);
+    const char *crt_name = "msvcrt.dll";
+#elif defined(__APPLE__)
+    const char *crt_name = "libSystem.B.dylib"; /* dlsym from flat namespace works for libSystem */
 #else
-    void *crt = poa_dlopen("libc.so.6", RTLD_LAZY | RTLD_LOCAL);
+    const char *crt_name = "libc.so.6";
+#endif
+    void *crt = poa_dlopen(crt_name, 0);
     CHECK("dlopen_crt", crt != NULL);
     CHECK("dlsym_printf", crt && poa_dlsym(crt, "printf") != NULL);
     CHECK("dlclose_ok", crt && poa_dlclose(crt) == 0);
-#endif
 
     /* item 6: console detection + VT enabling — either may legitimately fail headlessly */
     int vt = poa_console_enable_vt();
