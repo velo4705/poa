@@ -108,10 +108,11 @@ async function crossBlocker(targetArch: string): Promise<ActionResult["blocker"]
       ? `expected one of [${tc.ccCandidates.join(", ")}] on PATH — this host has native tools only`
       : `no cross toolchain profile known for arch '${targetArch}'`,
     ask: tc
-      ? `Debian/Ubuntu: sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu qemu-user-static\n` +
-        `NixOS:        nix develop    (POA's flake.nix provides cmake, ninja, qemu and the aarch64 cross gcc)\n` +
-        `or:           POA_SYSROOT=<path-to-sysroot> nix shell nixpkgs#pkgsCross.aarch64-multiplatform.stdenv.cc nixpkgs#qemu`
-      : "add a cross toolchain for this arch and retry",
+      ? `Debian/Ubuntu: sudo apt install ${tc.label}-gcc ${tc.label}-g++ qemu-user-static\n` +
+        `Windows from any host: POA_CMAKE_TOOLCHAIN_FILE=$POA_ROOT/scripts/zig-cross/windows-gnu-toolchain.cmake (zig cc, no system mingw needed)\n` +
+        `NixOS:        nix develop    (POA's flake.nix provides cmake, ninja, qemu and the cross toolchains)`
+      : `no cross toolchain profile for '${targetArch}' (see scripts/zig-cross/ — Windows targets build from any host with zig cc; no system MinGW required)\n` +
+        `Windows targets from any host: POA_CMAKE_TOOLCHAIN_FILE=$POA_ROOT/scripts/zig-cross/windows-gnu-toolchain.cmake`,
   };
 }
 
@@ -180,7 +181,11 @@ export async function buildPort(
   }
 
   const mode = opts.mode ?? "auto";
-  const crossNeeded = target.arch !== hostArch() && target.arch !== "wasm32";
+  // Native build only when OS family AND arch both match; otherwise cross.
+  // (windows targets from linux hosts are cross builds even at same arch)
+  const hostIsWindows = process.platform === "win32";
+  const targetIsWindows = target.os === "windows";
+  const crossNeeded = (target.arch !== hostArch() || hostIsWindows !== targetIsWindows) && target.arch !== "wasm32";
   const effectiveMode = mode === "auto" ? (crossNeeded ? "cross" : "native") : mode;
 
   const source = session.source;

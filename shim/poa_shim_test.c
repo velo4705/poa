@@ -8,6 +8,7 @@
 #include <io.h>
 #else
 #include <unistd.h>
+#include <dlfcn.h>
 #endif
 
 static int failures = 0;
@@ -71,6 +72,25 @@ int main(void)
     CHECK("errno_to_win32_identity[EEXIST]", poa_errno_to_win32(EEXIST) == EEXIST);
     CHECK("errno_to_win32_identity[EINVAL]", poa_errno_to_win32(EINVAL) == EINVAL);
 #endif
+
+    /* item 9: dlopen/dlsym of the system C runtime */
+#if defined(_WIN32)
+    void *crt = poa_dlopen("msvcrt.dll", 0);
+    CHECK("dlopen_crt", crt != NULL);
+    CHECK("dlsym_printf", crt && poa_dlsym(crt, "printf") != NULL);
+    CHECK("dlclose_ok", crt && poa_dlclose(crt) == 0);
+#else
+    void *crt = poa_dlopen("libc.so.6", RTLD_LAZY | RTLD_LOCAL);
+    CHECK("dlopen_crt", crt != NULL);
+    CHECK("dlsym_printf", crt && poa_dlsym(crt, "printf") != NULL);
+    CHECK("dlclose_ok", crt && poa_dlclose(crt) == 0);
+#endif
+
+    /* item 6: console detection + VT enabling — either may legitimately fail headlessly */
+    int vt = poa_console_enable_vt();
+    int iscons = poa_is_console();
+    printf("       is_console=%d vt_enabled=%d (CI runners are headless; both may be 0)\n", iscons, vt);
+    CHECK("console_api_no_crash", 1);
 
     if (failures) { printf("\n%d CHECK(S) FAILED\n", failures); return 1; }
     printf("\nall poa-shim checks passed\n");

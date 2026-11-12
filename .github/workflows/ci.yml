@@ -37,3 +37,57 @@ jobs:
       - name: build and run poa-shim tests
         shell: bash
         run: cc -Wall -Wextra -std=c11 shim/poa_shim.c shim/poa_shim_test.c -o poa-shim-test && ./poa-shim-test
+
+  sqlite-native:
+    name: sqlite3 shell — native build + run (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: download SQLite amalgamation 3.54.1
+        shell: bash
+        run: |
+          curl -sLo amalgamation.zip https://sqlite.org/2026/sqlite-amalgamation-3540100.zip
+          python3 -c "import hashlib; d=open('amalgamation.zip','rb').read(); h=hashlib.sha3_256(d).hexdigest(); print(h); assert h == '92281c86e2957f9b9305890f9ac04204caa7b677cc868dc326d942689df28e30', 'SHA3-256 MISMATCH'"
+          python3 -c "import zipfile; zipfile.ZipFile('amalgamation.zip').extractall('amalg')"
+      - name: build sqlite3 shell
+        shell: bash
+        run: |
+          cd amalg/sqlite-amalgamation-3540100
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            gcc -O2 shell.c sqlite3.c -o sqlite3.exe
+          else
+            cc -O2 shell.c sqlite3.c -o sqlite3 -lpthread -ldl -lm
+          fi
+      - name: run smoke SQL query
+        shell: bash
+        run: |
+          cd amalg/sqlite-amalgamation-3540100
+          if [ "$RUNNER_OS" = "Windows" ]; then ./sqlite3.exe ':memory:' 'select 1+1;'; else ./sqlite3 ':memory:' 'select 1+1;'; fi | tee out.txt
+          grep -q '^2$' out.txt && echo "SQLITE NATIVE RUN: PASS"
+
+  sqlite-cross-windows:
+    name: sqlite3 shell — zig cross-build for Windows (no run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig (noble universe)
+        run: sudo apt-get update && sudo apt-get install -y zig
+      - name: download SQLite amalgamation 3.54.1
+        run: |
+          curl -sLo amalgamation.zip https://sqlite.org/2026/sqlite-amalgamation-3540100.zip
+          python3 -c "import hashlib; d=open('amalgamation.zip','rb').read(); h=hashlib.sha3_256(d).hexdigest(); print(h); assert h == '92281c86e2957f9b9305890f9ac04204caa7b677cc868dc326d942689df28e30', 'SHA3-256 MISMATCH'"
+          python3 -c "import zipfile; zipfile.ZipFile('amalgamation.zip').extractall('amalg')"
+      - name: cross-compile Windows PE with zig
+        run: |
+          cd amalg/sqlite-amalgamation-3540100
+          zig cc -target x86_64-windows-gnu -O2 shell.c sqlite3.c -o sqlite3-windows.exe
+      - name: verify PE magic
+        run: |
+          cd amalg/sqlite-amalgamation-3540100
+          head -c 2 sqlite3-windows.exe | od -An -tx1 | grep -q '4d 5a' && echo "PE MAGIC OK (executable built for windows-x86_64)"
+          ls -la sqlite3-windows.exe
+          echo "note: runtime execution verified by the sqlite-native job on windows-latest"

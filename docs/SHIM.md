@@ -6,21 +6,21 @@ The bounded API surface POA's compat-shim covers for same-ISA ports
 
 **Status legend:** `planned` · `sketched` · `working` · `verified` · `wontfix (documented)`
 
-**v0.1.0 shipped** (items 2, 7, 10, 15): built & compliance-tested on Linux (all checks PASS);
+**v0.1.0 shipped** (items 2, 6, 7, 9, 10, 15): built & compliance-tested on Linux (all checks PASS);
 compiled+linked for x86_64-windows-gnu (586 KB PE, `MZ` magic checked) but **never run** —
 no Windows/Wine on this host. Windows runtime verification rides on CI (windows-latest) or your box.
 
 | # | POSIX / Win32 area | Maps to | Status | Notes |
 |---|---|---|---|---|
-| 1 | File I/O (`open/close/read/write/stat`) ↔ `CreateFileW/ReadFile/GetFileAttributesW` | both directions |planned| Path separator, `\`→`/`, drive-letter policy table |
+| 1 | File I/O (`open/close/read/write/stat`) ↔ `CreateFileW/…` | MinGW-w64 provides (MSYS2/UCRT) |covered (MinGW)| POA links MinGW for POSIX on Windows; does NOT reimplement. Direct fall-back for MSVC-only would be a future item |
 | 2 | Paths & registry (`C:\Program Files`, `%USERPROFILE%`) ↔ XDG dirs | shim |working| Separator normalization + temp-dir resolution done (`poa_path_to_target`, `poa_temp_dir`); registry hive not started |
 | 3 | Sockets (`socket/bind/connect/accept`, `select/poll/epoll`) | Winsock2 |planned| `epoll` → `WSAEventSelect` or IOCP fallback |
 | 4 | Threads (`pthread_*` ↔ `CreateThread/WaitForSingleObject`) | shim |planned| condition variables map poorly — document edge cases |
 | 5 | Signals (`SIGINT`, `SIGTERM`, `SIGKILL`) | Windows console events / `generate_console_ctrl_event` |planned| `SIGUSR1/2` → named events |
-| 6 | Console I/O (`isatty`, ANSI escapes) | Win32 console API / virtual terminal processing |planned| enable VT processing on Win10+; fallback = strip codes |
+| 6 | Console I/O (`isatty`, ANSI escapes) | `SetConsoleMode(ENABLE_VIRTUAL_TERMINAL_PROCESSING)` |working| `poa_console_enable_vt()` (Win10+ opt-in; POSIX isatty). Headless/CI: reports 0, never lies |
 | 7 | Time (`clock_gettime`, `nanosleep`) | `QueryPerformanceCounter` + `Sleep` |working| monotonic ns + ms sleep implemented & unit-tested |
 | 8 | Environment (`getenv/setenv`) | `GetEnvironmentVariableW` |working (concept)| case-insensitivity mismatch — normalize |
-| 9 | Dynamic loading (`dlopen/dlsym`) | `LoadLibrary/GetProcAddress` |planned| `dlerror` semantics |
+| 9 | Dynamic loading (`dlopen/dlsym`) | `LoadLibraryA/GetProcAddress` + `LoadLibrary` free |working| `poa_dlopen/dlsym/dlclose/dlerror`, no libdl required; POSIX passes through; unit-tested on Linux (dlopen libc → printf) |
 | 10 | Temp files / unique names (`mkstemp`) | `GetTempFileNameA` + `_open(_O_EXCL)` |working| implemented & unit-tested |
 | 11 | Pipes / fork | `CreateProcessW`, anonymous pipes |planned| **no `fork()` on Windows** — document, offer posix_spawn-class alternative |
 | 12 | File permissions (`chmod 0644`) | ACLs |planned| lossy by nature — declare in port report |

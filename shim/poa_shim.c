@@ -1,6 +1,12 @@
 #define _POSIX_C_SOURCE 200809L
 #include "poa_shim.h"
 
+#if defined(_MSC_VER)
+#define POA_TLS __declspec(thread)
+#else
+#define POA_TLS __thread
+#endif
+
 #include <string.h>
 #include <stdio.h>
 
@@ -17,6 +23,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
+#include <dlfcn.h>
 #endif
 
 static int last_error_to_errno_internal(void);
@@ -186,3 +193,83 @@ int poa_last_error_to_errno(void) { return last_error_to_errno_internal(); }
 
 int poa_errno_to_win32(int err) { (void)err; return err; } /* identity: no Win32 on POSIX hosts */
 #endif
+
+/* ------- item 6: console ------- */
+int poa_console_enable_vt(void)
+{
+#if POA_WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE hErr = GetStdHandle(STD_ERROR_HANDLE);
+    DWORD mode;
+    int enabled = 0;
+    if (hOut != INVALID_HANDLE_VALUE && GetConsoleMode(hOut, &mode)) {
+        if (SetConsoleMode(hOut, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) enabled = 1;
+    }
+    if (hErr != INVALID_HANDLE_VALUE && GetConsoleMode(hErr, &mode)) {
+        if (SetConsoleMode(hErr, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) enabled = 1;
+    }
+    return enabled;
+#else
+    return isatty(STDOUT_FILENO);
+#endif
+}
+
+int poa_is_console(void)
+{
+#if POA_WIN32
+    DWORD mode;
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    return (hOut != INVALID_HANDLE_VALUE && GetConsoleMode(hOut, &mode)) ? 1 : 0;
+#else
+    return isatty(STDOUT_FILENO);
+#endif
+}
+
+/* ------- item 9: dlopen without libdl ------- */
+void *poa_dlopen(const char *name, int flags)
+{
+    (void)flags;
+#if POA_WIN32
+    if (!name) return (void *)GetModuleHandleA(NULL);   /* passing NULL → main module, like dlopen(NULL) */
+    return (void *)LoadLibraryA(name);
+#else
+    return dlopen(name, flags ? flags : RTLD_LAZY);
+#endif
+}
+
+void *poa_dlsym(void *handle, const char *symbol)
+{
+#if POA_WIN32
+    return (void *)GetProcAddress((HMODULE)handle, symbol);
+#else
+    return dlsym(handle, symbol);
+#endif
+}
+
+int poa_dlclose(void *handle)
+{
+#if POA_WIN32
+    /* don't treat failure as fatal: FreeLibrary crash vs. returning nonzero — report nonzero */
+    return FreeLibrary((HMODULE)handle) ? 0 : -1;
+#else
+    return dlclose(handle);
+#endif
+}
+
+const char *poa_dlerror(void)
+{
+#if POA_WIN32
+    static POA_TLS char buf[512];
+    DWORD e = GetLastError();
+    if (e == 0) { buf[0] = '\0'; return NULL; }
+    DWORD n = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                             NULL, e, 0, buf, sizeof buf, NULL);
+    if (n == 0) buf[0] = '\0';
+    /* trim trailing newline FormatMessage appends */
+    size_t len = strnlen(buf, sizeof buf);
+    while (len > 0 && (buf[len-1] == '\n' || buf[len-1] == '\r')) buf[--len] = '\0';
+    return buf;
+#else
+    return dlerror();
+#endif
+}

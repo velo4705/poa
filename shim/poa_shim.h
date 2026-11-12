@@ -44,6 +44,24 @@ int poa_last_error_to_errno(void);
 /* POSIX errno → nearest Win32 code. */
 int poa_errno_to_win32(int err);
 
+/* ------- item 6: console -------
+ * Windows 10+ terminals support ANSI/VT escape sequences, but the console must
+ * opt in via ENABLE_VIRTUAL_TERMINAL_PROCESSING. MinGW does NOT do this for
+ * you — poa_console_enable_vt() does, once per process. On POSIX isatty decides. */
+int poa_console_enable_vt(void);
+
+/* 1 if stdout is a console/tty, else 0. */
+int poa_is_console(void);
+
+/* ------- item 9: dynamic loading without libdl -------
+ * POSIX: dlopen/dlsym/dlclose pass-through (links with -ldl on glibc<2.34).
+ * Windows: LoadLibraryA/GetProcAddress/FreeLibrary — no libdl needed. */
+void *poa_dlopen(const char *name, int flags);
+void *poa_dlsym(void *handle, const char *symbol);
+int poa_dlclose(void *handle);
+/* Human-readable error from the last dlopen failure (thread-local, do not free). */
+const char *poa_dlerror(void);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

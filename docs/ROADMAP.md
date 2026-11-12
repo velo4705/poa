@@ -81,6 +81,8 @@ Landed (v0.3.0):
 - `poa.scan_dependencies` — ELF (readelf/DT_NEEDED), PE (objdump/DLL imports),
   WASM (import-section scan); Mach-O → honest unsupported, never faked
 - `shim/` v0.1.0 — poa-shim: path/mkstemp/monotonic-time/errno↔GetLastError, compliance-tested
+- `shim/` v0.1.0 → v0.2 (items 2, 6, 7, 9, 10, 15) — item 1 covered by MinGW-w64, not reimplemented
+- CI proves two lanes of one manifest: native builds+run on ubuntu/macos/windows (sqlite3 shell 3.54.1, SHA3-256-pinned) and zig cross-build for x86_64-windows on ubuntu (PE magic check; runtime verified by windows-latest)
 - `docs/SHIM.md` — POSIX↔Win32 compliance matrix, 18 mappings, fork() absence
   flagged as top failure mode; lossy mappings must be declared in the port report
 - CI: Ubuntu + Windows + macOS build + stdio smoke (`.github/workflows/ci.yml`)
