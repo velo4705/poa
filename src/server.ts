@@ -25,6 +25,8 @@ import {
 } from "./targets.js";
 import { ingest } from "./manifest.js";
 import { mapDiscrepancies } from "./discrepancy.js";
+import { scanDependencies } from "./scan.js";
+import { chooseStrategy } from "./strategy.js";
 import { detectBuildSystem } from "./buildsystem.js";
 import { buildPort, verifyPort } from "./build.js";
 import {
@@ -38,7 +40,7 @@ import {
 } from "./session.js";
 import type { PortReport, PortStatus } from "./report.js";
 
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 const CWD = process.cwd();
 
 const server = new McpServer({ name: "poa", version: VERSION });
@@ -159,6 +161,56 @@ server.registerTool(
     } catch (err) {
       return fail(`Ingest failed: ${(err as Error).message}`);
     }
+  },
+);
+
+server.registerTool(
+  "poa.scan_dependencies",
+  {
+    title: "Scan dependency closure",
+    description:
+      "Enumerate a binary's direct dependencies: ELF via readelf (DT_NEEDED), PE via objdump (DLL Name imports), WASM via import-section scan. Reports 'unsupported' honestly for Mach-O/managed bytecode — never invents a list. In a session, defaults to the session source.",
+    inputSchema: {
+      path: z.string().optional().describe("Path to the binary; defaults to the open session's source"),
+    },
+  },
+  async ({ path: p }) => {
+    const session = await getSession(CWD);
+    const target = p ?? session?.source;
+    if (!target) return fail("No path given and no session — run poa.start_port first or pass 'path'.");
+    try {
+      return json(await scanDependencies(target));
+    } catch (err) {
+      return fail((err as Error).message);
+    }
+  },
+);
+
+server.registerTool(
+  "poa.choose_strategy",
+  {
+    title: "Choose the porting strategy",
+    description:
+      "The decision ladder, computed from evidence: source→cross-compile (NEAR-LOSSLESS), source same-OS→native (LOSSLESS), binary same-ISA→compat-shim (DEGRADED), binary cross-ISA→lift-to-IR/DBT (DEGRADED, M3 unproven), WASM→runtime (NEAR-LOSSLESS), iOS-binary/anything policy-blocked→impossible-on-platform. Returns rationale, requirements, and the concrete tool chain to run next.",
+    inputSchema: {
+      source: z.string().optional().describe("Path to the input; defaults to the open session's source"),
+      target: z.string().optional().describe("Target id; defaults to the open session's target"),
+    },
+  },
+  async ({ source, target }) => {
+    const session = await getSession(CWD);
+    const src = source ?? session?.source;
+    const tgt = target ?? session?.target;
+    if (!src || !tgt) return fail("Need source and target (or an open session to default them from).");
+    const profile = await findTargetAsync(tgt, CWD);
+    if (!profile) return fail(`Unknown target '${tgt}'.`);
+    let manifest;
+    try {
+      manifest = await ingest(src);
+    } catch (err) {
+      return fail(`Ingest failed: ${(err as Error).message}`);
+    }
+    return json(chooseStrategy(manifest, profile));
   },
 );
 

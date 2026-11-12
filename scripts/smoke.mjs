@@ -5,6 +5,8 @@ import path from "node:path";
 
 const sessionCwd = mkdtempSync(path.join(tmpdir(), "poa-smoke-"));
 const serverCwd = process.env.POA_REPO ?? process.cwd();
+const inspectPath = process.env.POA_INSPECT ?? "/bin/ls";
+console.log("inspecting:", inspectPath);
 console.log("session cwd:", sessionCwd, "| repo:", serverCwd);
 
 const server = spawn("node", [path.join(serverCwd, "dist/server.js")], { cwd: sessionCwd });
@@ -67,6 +69,8 @@ await call("poa.list_targets", {}, { truncate: true });
 await call("poa.start_port", { source: poaRepo, target: "linux-aarch64-generic", provenance: "own-code", strategy: "cross-compile" });
 await call("poa.detect_buildsystem", {});
 await call("poa.plan_port", { source: poaRepo, target: "linux-aarch64-generic" }, { truncate: true });
+await call("poa.scan_dependencies", { path: inspectPath });
+await call("poa.choose_strategy", { source: poaRepo, target: "linux-aarch64-generic" });
 await call("poa.build", {});          // no $DISPLAY/aarch64 gcc expected — must fail gracefully
 await call("poa.verify", { timeoutMs: 1000 }); // no artifact built — must fail gracefully
 await call("poa.declare_degradation", { key: "smoke-test", value: "declared during smoke test" });

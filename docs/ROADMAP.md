@@ -69,14 +69,24 @@ nix develop --command node scripts/m1-doom.mjs # full gate: clone required at /t
 **Kill criteria for scope:** if DOOM needs GPU pathfinding we can't reach, drop to
 Chocolate DOOM's SDL1 renderer or build server-mode first — don't rathole.
 
-## M2 — Two Sides, Same Face: Linux ↔ Windows Parity (Mar – May 2027)
+## M2 — Two Sides, Same Face: Linux ↔ Windows Parity (Mar – May 2027) 🏃 in progress
 
 **Goal:** prove "exclusive port, converted, looks identical" for the case that
 happens *today*: same-ISA C/C++ porting between Linux and Windows.
 
-New capabilities:
-- `poa.choose_strategy` — evidence-driven decision ladder:
-  `source+same-ISA→cross-build` · `source+arch→cross-build+tune` · `binary+same-ISA→shim` · `binary+arch→lift` (M3)
+Landed (v0.3.0):
+- `poa.choose_strategy` — evidence-driven decision ladder (source→native LOSSLESS,
+  source+arch→cross NEAR-LOSSLESS, binary same-ISA→compat-shim DEGRADED,
+  binary cross-ISA→lift-to-IR/DBT DEGRADED, WASM→runtime, iOS-policy→impossible)
+- `poa.scan_dependencies` — ELF (readelf/DT_NEEDED), PE (objdump/DLL imports),
+  WASM (import-section scan); Mach-O → honest unsupported, never faked
+- `docs/SHIM.md` — POSIX↔Win32 compliance matrix, 18 mappings, fork() absence
+  flagged as top failure mode; lossy mappings must be declared in the port report
+- CI: Ubuntu + Windows + macOS build + stdio smoke (`.github/workflows/ci.yml`)
+
+Still to do (M2 gate):
+- POSIX↔Win32 shim implementation increments (items 1–15 of SHIM.md)
+- Cross-build matrix in CI; ≥ 8 license-clean projects green on both OSes
 - POSIX↔Win32 ABI shim surface, bounded and growing by demand:
   files/paths, sockets, threads, time, signals, console — with a compliance matrix
 - `poa.scan_dependencies` — `DT_NEEDED`, PE import tables, WASM imports → closure diff
