@@ -181,6 +181,38 @@ function detectZip(buf: Buffer, sizeBytes: number, input: string): PortManifest 
   };
 }
 
+const SOURCE_MARKERS = [
+  "CMakeLists.txt",
+  "meson.build",
+  "configure",
+  "autogen.sh",
+  "Cargo.toml",
+  "go.mod",
+  "package.json",
+  "pyproject.toml",
+  "pom.xml",
+  "build.gradle",
+  "build.gradle.kts",
+  "SConstruct",
+  "Makefile",
+  ".git",
+];
+
+async function detectSourceMarkers(dir: string): Promise<string[]> {
+  const found: string[] = [];
+  await Promise.all(
+    SOURCE_MARKERS.map(async (m) => {
+      try {
+        await fs.access(path.join(dir, m));
+        found.push(m);
+      } catch {
+        /* absent */
+      }
+    }),
+  );
+  return found;
+}
+
 function looksLikeSourceDir(name: string): boolean {
   return [".git", "src", "package.json", "CMakeLists.txt", "Cargo.toml", "go.mod"].some((n) =>
     name.includes(n),
@@ -192,16 +224,31 @@ export async function ingest(inputPath: string): Promise<PortManifest> {
   const stat = await fs.stat(abs);
 
   if (stat.isDirectory()) {
+    const markers = await detectSourceMarkers(abs);
+    if (markers.length > 0 || looksLikeSourceDir(abs)) {
+      return {
+        input: abs,
+        kind: "source",
+        format: `source tree (${markers.join(", ") || "convention markers"})`,
+        arch: "unknown", // source has no ISA until compiled — the discrepancy mapper treats this correctly
+        bits: null,
+        endianness: null,
+        platformHint: null,
+        sizeBytes: 0,
+        confidence: markers.length > 0 ? 0.9 : 0.6,
+        unknowns: [],
+      };
+    }
     return {
       input: abs,
-      kind: looksLikeSourceDir(abs) ? "source" : "unknown",
-      format: "directory tree",
+      kind: "unknown",
+      format: "directory tree (no source markers found)",
       arch: "unknown",
       bits: null,
       endianness: null,
       platformHint: null,
       sizeBytes: 0,
-      confidence: looksLikeSourceDir(abs) ? 0.7 : 0.3,
+      confidence: 0.3,
       unknowns: ["build system detection", "dependency closure"],
     };
   }

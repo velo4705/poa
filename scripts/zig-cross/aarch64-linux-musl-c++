@@ -1,0 +1,3 @@
+#!/bin/sh
+# Cross C++ compiler for aarch64-linux-musl via zig c++. Fully static.
+exec zig c++ -target aarch64-linux-musl -static "$@"

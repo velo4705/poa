@@ -1,30 +1,40 @@
 /**
  * POA target profiles.
  *
- * A target is a static description of a device class: arch, OS, RAM, GPU,
- * inputs, display, and accepted binary formats. Adapters (see docs/ROADMAP.md)
- * are generated per target; these profiles are what the discrepancy mapper
- * diffs inputs against.
+ * Built-in targets plus user-registered ones in `.poa/targets/*.json`
+ * (see poa.add_target). User profiles are validated strictly with zod —
+ * a malformed fridge definition fails loudly, not at port time.
  */
 
-export type GpuClass =
-  | { kind: "hardware"; api: string }
-  | { kind: "software-only" }
-  | { kind: "unknown" };
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { z } from "zod";
 
-export interface TargetProfile {
-  id: string;
-  description: string;
-  arch: string;
-  os: string;
-  /** Approximate RAM; 0 means "kilobytes in practice" (MCU-class). */
-  ramMb: number;
-  gpu: GpuClass;
-  inputs: string[];
-  display: string | null;
-  /** Binary formats this target can execute/package. */
-  binFormats: string[];
-}
+export const gpuClassSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("hardware"), api: z.string().min(1) }),
+  z.object({ kind: z.literal("software-only") }),
+  z.object({ kind: z.literal("unknown") }),
+]);
+
+export const targetProfileSchema = z.object({
+  id: z
+    .string()
+    .min(2)
+    .max(64)
+    .regex(/^[a-z0-9][a-z0-9-]*$/, "id must be lowercase alphanumeric with dashes"),
+  description: z.string().min(1),
+  arch: z.string().min(1),
+  os: z.string().min(1),
+  /** Approximate RAM in MiB; 0 = kilobytes in practice (MCU-class). */
+  ramMb: z.number().int().min(0),
+  gpu: gpuClassSchema,
+  inputs: z.array(z.string().min(1)).min(1),
+  display: z.string().nullable(),
+  /** Binary formats this target can execute/package ("elf", "wasm", "pe", "apk"...). */
+  binFormats: z.array(z.string().min(1)).min(1),
+});
+
+export type TargetProfile = z.infer<typeof targetProfileSchema>;
 
 export const TARGETS: readonly TargetProfile[] = [
   {
@@ -84,6 +94,49 @@ export const TARGETS: readonly TargetProfile[] = [
   },
 ] as const;
 
-export function findTarget(id: string): TargetProfile | undefined {
+export function findBuiltinTarget(id: string): TargetProfile | undefined {
   return TARGETS.find((t) => t.id === id);
+}
+
+export async function loadUserTarget(cwd: string, id: string): Promise<TargetProfile | undefined> {
+  const file = path.join(cwd, ".poa", "targets", `${id}.json`);
+  try {
+    const raw = await fs.readFile(file, "utf8");
+    const parsed = targetProfileSchema.safeParse(JSON.parse(raw));
+    if (!parsed.success) return undefined;
+    return parsed.data;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function findTargetAsync(id: string, cwd: string): Promise<TargetProfile | undefined> {
+  return findBuiltinTarget(id) ?? (await loadUserTarget(cwd, id));
+}
+
+export async function saveUserTarget(cwd: string, profile: TargetProfile): Promise<string> {
+  const dir = path.join(cwd, ".poa", "targets");
+  await fs.mkdir(dir, { recursive: true });
+  if (findBuiltinTarget(profile.id)) {
+    throw new Error(`'${profile.id}' collides with a built-in target id — choose another id`);
+  }
+  const file = path.join(dir, `${profile.id}.json`);
+  await fs.writeFile(file, JSON.stringify(profile, null, 2));
+  return file;
+}
+
+export async function listUserTargets(cwd: string): Promise<TargetProfile[]> {
+  const dir = path.join(cwd, ".poa", "targets");
+  try {
+    const files = await fs.readdir(dir);
+    const out: TargetProfile[] = [];
+    for (const f of files) {
+      if (!f.endsWith(".json")) continue;
+      const t = await loadUserTarget(cwd, f.slice(0, -5));
+      if (t) out.push(t);
+    }
+    return out;
+  } catch {
+    return [];
+  }
 }

@@ -73,11 +73,12 @@ export function mapDiscrepancies(manifest: PortManifest, target: TargetProfile):
     });
   }
 
-  // --- Source inputs: cross-compilation -----------------------------------------
-  if (manifest.kind === "source" && manifest.arch !== target.arch) {
+  // --- Source inputs: compilation for the target ---------------------------------
+  if (manifest.kind === "source") {
     gaps.push({
-      need: `cross-compile for ${target.arch}`,
-      detail: "orchestrated toolchain (CMake toolchain file / Nix / cross-clang)",
+      need: `compile for ${target.arch}`,
+      detail:
+        "source has no ISA until built; poa.build chooses native vs cross toolchain from host arch vs target",
       resolution: "auto",
     });
   }

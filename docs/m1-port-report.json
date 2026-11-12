@@ -1,0 +1,42 @@
+{
+  "tool": "poa",
+  "version": "0.2.0",
+  "source": "/tmp/opencode/chocolate-doom",
+  "target": "linux-aarch64-generic",
+  "sessionId": "chocolate-doom-78fc42",
+  "status": "verified",
+  "manifest": {
+    "input": "/tmp/opencode/chocolate-doom",
+    "kind": "source",
+    "format": "source tree (CMakeLists.txt, autogen.sh, .git)",
+    "arch": "unknown",
+    "bits": null,
+    "endianness": null,
+    "platformHint": null,
+    "sizeBytes": 0,
+    "confidence": 0.9,
+    "unknowns": []
+  },
+  "discrepancies": {
+    "target": "linux-aarch64-generic",
+    "gaps": [
+      {
+        "need": "compile for aarch64",
+        "detail": "source has no ISA until built; poa.build chooses native vs cross toolchain from host arch vs target",
+        "resolution": "auto"
+      }
+    ],
+    "fullyAutomatic": true
+  },
+  "blockers": [],
+  "degraded": {},
+  "verification": {
+    "at": "2026-11-12T02:17:37.298Z",
+    "mode": "qemu-or-native",
+    "artifact": "/tmp/opencode/m1-work/.poa/build/chocolate-doom-78fc42/src/chocolate-doom",
+    "exitCode": 0,
+    "outcome": "passed",
+    "outputTail": "Chocolate Doom 3.1.1\n\n"
+  },
+  "generatedAt": "2026-11-12T02:17:37.301Z"
+}

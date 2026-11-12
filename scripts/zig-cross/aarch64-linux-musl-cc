@@ -1,0 +1,4 @@
+#!/bin/sh
+# Cross C compiler for aarch64-linux-musl via zig cc. Fully static.
+# Requires: zig on PATH (nixpkgs#zig, or https://ziglang.org/download/).
+exec zig cc -target aarch64-linux-musl -static "$@"

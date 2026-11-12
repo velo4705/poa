@@ -1,10 +1,13 @@
-/**
- * Minimal stdio smoke test for poa-mcp.
- * Spawns the server, performs the MCP handshake, lists tools, and calls each.
- */
 import { spawn } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 
-const server = spawn("node", ["dist/server.js"], { cwd: process.cwd() });
+const sessionCwd = mkdtempSync(path.join(tmpdir(), "poa-smoke-"));
+const serverCwd = process.env.POA_REPO ?? process.cwd();
+console.log("session cwd:", sessionCwd, "| repo:", serverCwd);
+
+const server = spawn("node", [path.join(serverCwd, "dist/server.js")], { cwd: sessionCwd });
 let buf = "";
 const pending = new Map();
 let id = 0;
@@ -22,7 +25,7 @@ server.stdout.on("data", (d) => {
         pending.get(msg.id)(msg);
         pending.delete(msg.id);
       }
-    } catch { /* not json */ }
+    } catch { /* noise */ }
   }
 });
 server.stderr.on("data", (d) => process.stderr.write("[srv] " + d));
@@ -50,21 +53,43 @@ const tools = await send("tools/list", {});
 const names = tools.result.tools.map((t) => t.name);
 console.log("tools ->", names.join(", "));
 
-const call = async (name, args) => {
+const call = async (name, args, opts = {}) => {
   const r = await send("tools/call", { name, arguments: args });
-  const text = r.result?.content?.[0]?.text;
-  let parsed;
-  try { parsed = JSON.parse(text); } catch { parsed = text; }
+  const text = r.result?.content?.[0]?.text ?? "";
   console.log(`\n== ${name} ==`);
-  console.log(JSON.stringify(parsed, null, 2));
-  return parsed;
+  const print = text.length > 1500 && opts.truncate !== false ? text.slice(0, 1500) + "\n…[truncated]" : text;
+  console.log(print);
+  try { return JSON.parse(text); } catch { return text; }
 };
 
-await call("poa.list_targets", {});
-await call("poa.scout_target", { target: "linux-aarch64-generic" });
-await call("poa.scout_target", { target: "nope" });
-await call("poa.inspect_input", { path: "/bin/ls" });
-await call("poa.plan_port", { source: "/bin/ls", target: "linux-aarch64-generic" });
+const poaRepo = serverCwd;
+await call("poa.list_targets", {}, { truncate: true });
+await call("poa.start_port", { source: poaRepo, target: "linux-aarch64-generic", provenance: "own-code", strategy: "cross-compile" });
+await call("poa.detect_buildsystem", {});
+await call("poa.plan_port", { source: poaRepo, target: "linux-aarch64-generic" }, { truncate: true });
+await call("poa.build", {});          // no $DISPLAY/aarch64 gcc expected — must fail gracefully
+await call("poa.verify", { timeoutMs: 1000 }); // no artifact built — must fail gracefully
+await call("poa.declare_degradation", { key: "smoke-test", value: "declared during smoke test" });
+const esc = await call("poa.request_human", { question: "Proceed with CMake cross build?", options: ["yes", "no"] });
+await call("poa.resolve_escalation", { id: esc.id, choice: "yes" });
+await call("poa.port_status", {});
+await call("poa.get_report", {}, { truncate: true });
+await call("poa.add_target", {
+  profile: JSON.stringify({
+    id: "smoke-fridge-v1",
+    description: "Smoke-test smart fridge",
+    arch: "aarch64",
+    os: "linux",
+    ramMb: 1024,
+    gpu: { kind: "software-only" },
+    inputs: ["touch"],
+    display: "800x480",
+    binFormats: ["wasm"],
+  }),
+});
+await call("poa.scout_target", { target: "smoke-fridge-v1" });
 
 server.kill();
+rmSync(sessionCwd, { recursive: true, force: true });
+console.log("\nsmoke: PASS (session dir cleaned)");
 process.exit(0);
