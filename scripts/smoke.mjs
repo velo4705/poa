@@ -92,6 +92,9 @@ await call("poa.add_target", {
   }),
 });
 await call("poa.scout_target", { target: "smoke-fridge-v1" });
+await call("poa.finish_port", { decision: "abandon", note: "smoke test cleanup" });
+await call("poa.sessions", {}, { truncate: true });
+await call("poa.session_switch", { root: serverCwd });
 
 server.kill();
 rmSync(sessionCwd, { recursive: true, force: true });

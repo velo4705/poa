@@ -68,6 +68,12 @@ open-source software, or binaries you're licensed to modify or redistribute.
 POA is not a circumvention tool. No DRM removal, no anti-cheat bypass.
 Console targets require platform-holder SDK access.
 
+## Usage
+
+Short version: the agent drives POA; the state lives in the project root's
+`.poa/`; the input can live anywhere. Full walkthrough — new session, existing
+session, multi-project, concurrency — in **`docs/USAGE.md`**.
+
 ## Quick Start
 
 ```sh
@@ -108,4 +114,4 @@ docs/               # architecture, milestone roadmap, M1 port report, acceptanc
 flake.nix           # dev shell: node, cmake, ninja, qemu-user, zig (all binary-cached)
 ```
 
-See `docs/ARCHITECTURE.md` and `docs/ROADMAP.md`.
+See `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/USAGE.md`.
