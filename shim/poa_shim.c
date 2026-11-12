@@ -61,21 +61,34 @@ int poa_temp_dir(char *dst, size_t dst_size)
 int poa_mkstemp(char *tmpl)
 {
 #if POA_WIN32
-    /* mkstemp semantics on Windows: unique name in place of XXXXXX. */
+    /* mkstemp(3) semantics on Windows: template IS the full path with
+     * "XXXXXX" as the unique-name placeholder. Generate a candidate with
+     * an explicit create-exclusively loop — no GetTempFileName (its 3-char
+     * prefix limit made the old code produce garbage). */
     size_t n = strnlen(tmpl, 4096);
-    if (n < 6 || strcmp(tmpl + n - 6, "XXXXXX") != 0) { errno = EINVAL; return -1; }
-    char dir[MAX_PATH + 1];
-    if (poa_temp_dir(dir, sizeof dir) != 0) return -1;
-    char unique[MAX_PATH + 1];
-    memcpy(unique, tmpl, n - 6);
-    unique[n - 6] = '\0';
-    /* Reuse GetTempFileName for uniqueness in the tmpl-derived prefix. */
-    char taken[MAX_PATH + 1];
-    UINT r = GetTempFileNameA(dir, unique, 0, taken);
-    if (r == 0) { errno = last_error_to_errno_internal(); return -1; }
-    if (snprintf(tmpl, 4096, "%s", taken) >= 4096) { errno = ENAMETOOLONG; return -1; }
-    int fd = _open(taken, _O_CREAT | _O_EXCL | _O_RDWR | _O_BINARY, _S_IREAD | _S_IWRITE);
-    return fd; /* -1 with errno set on failure */
+    if (n < 6 || strncmp(tmpl + n - 6, "XXXXXX", 6) != 0) { errno = EINVAL; return -1; }
+    char prefix[4096];
+    memcpy(prefix, tmpl, n - 6);
+    prefix[n - 6] = '\0';
+    DWORD pid = GetCurrentProcessId();
+    DWORD tick = GetTickCount();
+    for (int attempt = 0; attempt < 1000; attempt++) {
+        unsigned hash = (unsigned)(pid * 2654435761u) ^ (unsigned)(tick * 40503u) ^ (unsigned)(attempt * 2246822519u);
+        char candidate[4104];
+        if (snprintf(candidate, sizeof candidate, "%s%06x", prefix, hash & 0xffffffu) < 0) {
+            errno = ENAMETOOLONG;
+            return -1;
+        }
+        int fd = _open(candidate, _O_CREAT | _O_EXCL | _O_RDWR | _O_BINARY, _S_IREAD | _S_IWRITE);
+        if (fd >= 0) {
+            if (strlen(candidate) >= 4096) { _close(fd); errno = ENAMETOOLONG; return -1; }
+            memcpy(tmpl, candidate, strlen(candidate) + 1);
+            return fd;
+        }
+        if (errno != EEXIST) return -1; /* ACL, disk full, readonly dir — report the real error */
+    }
+    errno = EEXIST; /* 1000 consecutive collisions: something is very wrong */
+    return -1;
 #else
     return mkstemp(tmpl);
 #endif

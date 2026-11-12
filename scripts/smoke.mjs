@@ -96,7 +96,16 @@ await call("poa.finish_port", { decision: "abandon", note: "smoke test cleanup" 
 await call("poa.sessions", {}, { truncate: true });
 await call("poa.session_switch", { root: serverCwd });
 
+// Register the exit listener BEFORE killing, so a fast exit isn't missed.
+const exited = new Promise((resolve) => {
+  server.once("exit", resolve);
+  server.once("error", resolve);
+  setTimeout(resolve, 10000);
+});
 server.kill();
-rmSync(sessionCwd, { recursive: true, force: true });
+// Wait for the child to actually exit before cleaning its temp dir —
+// on Windows, removing an in-use directory fails with EPERM.
+await exited;
+rmSync(sessionCwd, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
 console.log("\nsmoke: PASS (session dir cleaned)");
 process.exit(0);

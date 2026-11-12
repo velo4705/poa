@@ -63,7 +63,7 @@ int main(void)
 #if defined(_WIN32)
     CHECK("errno_to_win32[ENOENT]", poa_errno_to_win32(ENOENT) == 2 /* ERROR_FILE_NOT_FOUND */);
     CHECK("errno_to_win32[EACCES]", poa_errno_to_win32(EACCES) == 5 /* ERROR_ACCESS_DENIED */);
-    CHECK("errno_to_win32[EEXIST]", poa_errno_to_win32(EEXIST) == 0x50 /* ERROR_ALREADY_EXISTS = 80 */);
+    CHECK("errno_to_win32[EEXIST]", poa_errno_to_win32(EEXIST) == 183 /* ERROR_ALREADY_EXISTS: create-already-exists semantics */);
     CHECK("errno_to_win32[EINVAL]", poa_errno_to_win32(EINVAL) == 87 /* ERROR_INVALID_PARAMETER */);
 #else
     CHECK("errno_to_win32_identity[ENOENT]", poa_errno_to_win32(ENOENT) == ENOENT);
