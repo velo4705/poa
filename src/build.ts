@@ -27,9 +27,21 @@ export interface ActionResult {
 const TIMEOUT_BUILD_MS = 10 * 60 * 1000;
 const TIMEOUT_VERIFY_MS = 15 * 1000;
 
-async function which(cmd: string): Promise<string | null> {
+/**
+ * Resolve a command to an absolute path executable by the current OS.
+ * On Windows use `where` (native, returns Windows-style paths — MinGW's
+ * `which` emits POSIX paths like /c/... that execFile cannot use and
+ * which used to manifest as a silent "cmake configure failed (exit timeout)".
+ * On Linux/macOS use `which`.
+ */
+function which(cmd: string): Promise<string | null> {
   return new Promise((resolve) => {
-    execFile("which", [cmd], (err, stdout) => resolve(err ? null : stdout.trim()));
+    const finder = process.platform === "win32" ? "C:\\Windows\\System32\\where.exe" : "which";
+    execFile(finder, [cmd], { windowsHide: true }, (err, stdout) => {
+      if (err) return resolve(null);
+      const line = stdout.split(/\r?\n/).map((l) => l.trim()).find((l) => l.length > 0);
+      resolve(line ?? null);
+    });
   });
 }
 
@@ -56,7 +68,9 @@ function run(
       (err, stdout, stderr) => {
         const timedOut = !!err && (err as NodeJS.ErrnoException & { killed?: boolean }).killed === true;
         const code = err && typeof (err as NodeJS.ErrnoException).code === "number" ? ((err as NodeJS.ErrnoException).code as unknown as number) : err ? null : 0;
-        resolve({ code, stdout: String(stdout), stderr: String(stderr), timedOut });
+        const childStderr = String(stderr);
+        const enrichedStderr = err && !childStderr ? `${(err as NodeJS.ErrnoException).message}` : childStderr;
+        resolve({ code, stdout: String(stdout), stderr: enrichedStderr, timedOut });
       },
     );
   });
