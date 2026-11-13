@@ -72,6 +72,56 @@ jobs:
           export POA_M2_WORK="$RUNNER_TEMP/poa-zstd-work"
           node scripts/m2-compat-zstd.mjs
 
+  libarchive-poa-ubuntu:
+    name: libarchive — POA build, ubuntu → windows-x86_64 cross (zig)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja, mingw binutils (windres)
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build binutils-mingw-w64-x86-64
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone libarchive
+        run: git clone --depth 1 https://github.com/libarchive/libarchive.git "$GITHUB_WORKSPACE/libarchive"
+      - name: build bsdtar.exe via POA (cross → windows-x86_64-mingw)
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export LIBARCHIVE_SRC="$GITHUB_WORKSPACE/libarchive"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-libarchive-work"
+          node scripts/m2-compat-libarchive.mjs
+          find "$POA_M2_WORK" -name 'bsdtar.exe' -exec sh -c 'head -c 2 "$1" | od -An -tx1 | grep -q "4d 5a" && echo "PE MAGIC OK: $1"' _ {} \;
+
+  libarchive-poa-windows:
+    name: libarchive — POA build, windows-x86_64 (native, runs bsdtar --version)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        shell: pwsh
+        run: choco install cmake ninja -y
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone libarchive
+        run: git clone --depth 1 https://github.com/libarchive/libarchive.git "$env:GITHUB_WORKSPACE/libarchive"
+        shell: pwsh
+      - name: build + run bsdtar via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export LIBARCHIVE_SRC="$GITHUB_WORKSPACE/libarchive"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-libarchive-work"
+          node scripts/m2-compat-libarchive.mjs
+
   sqlite-poa-ubuntu:
     name: sqlite — POA build, ubuntu → windows-x86_64 cross (zig)
     runs-on: ubuntu-latest

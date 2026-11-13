@@ -1,0 +1,14 @@
+#!/bin/sh
+# Windres driven by zig as its C preprocessor.
+# zig cc handles C collection, but cannot emit .rc; mingw-w64 windres handles
+# .rc but demands x86_64-w64-mingw32-gcc as preprocessor which we don't ship.
+# This wrapper glues them: windres --preprocessor=zig --preprocessor-arg=cc ...
+exec x86_64-w64-mingw32-windres \
+  --preprocessor=zig \
+  --preprocessor-arg=cc \
+  --preprocessor-arg=-E \
+  --preprocessor-arg=-target \
+  --preprocessor-arg=x86_64-windows-gnu \
+  --preprocessor-arg=-x \
+  --preprocessor-arg=c \
+  "$@"
