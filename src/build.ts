@@ -252,7 +252,14 @@ export async function buildPort(
     };
   }
 
-  let configureArgs = ["-S", cmakeSrc, "-B", buildDir];
+  // Force Ninja everywhere: all three CI lanes install it; it is the only
+  // generator that works identically on Linux, macOS and the Windows native lane.
+  // Leaving this to CMake's Windows default (Visual Studio) hung the Windows lane
+  // in silent compiler-detection with zero output.
+  const ninja = (await which("ninja")) ?? (await which("ninja-build"));
+  let configureArgs = ninja
+    ? ["-S", cmakeSrc, "-B", buildDir, "-GNinja"]
+    : ["-S", cmakeSrc, "-B", buildDir];
   const envToolchainFile = process.env.POA_CMAKE_TOOLCHAIN_FILE;
   if (effectiveMode === "cross") {
     if (envToolchainFile) {
