@@ -23,6 +23,8 @@
             # windres (x86_64-w64-mingw32-windres) for .rc resource files —
             # zig cannot build them, but binutils wrapper is small and cached.
             pkgs.pkgsCross.mingwW64.buildPackages.binutils
+            # wine64 (minimal) — verify Windows PE binaries end-to-end on Linux
+            pkgs.wine64Packages.minimal
           ];
 
           shellHook = ''

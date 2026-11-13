@@ -100,8 +100,8 @@ Gate evidence so far (all through POA's own pipeline, no source edits):
 - SQLite 3.54.1 amalgamation → native run on Linux (`--version` + `select 1+1` → 2),
   Windows PE built; CI windows-latest lane runs it natively
 - Chocolate DOOM DEMO1 replayed headlessly under qemu-user on aarch64 (2664 gametics, Freedoom BSD)
-- libarchive v1.7.x (unmodified, CMake) → 762/762 targets; bsdtar/bsdcat/bsdcpio/bsdunzip
-  PE built and magic-verified; windows lane runs bsdtar --version
+- libarchive (unmodified) → 762/762 targets; bsdtar/bsdcat/bsdcpio/bsdunzip PE built;
+  runtime-verify via wine64 (bsdtar 3.9.0 runs; create→list→extract roundtrip verified)
 - 2 of 8 corpus projects done (zstd, sqlite, libarchive = 3 actually); runtime-verified on
   Linux only — Windows runtime still rides CI windows-latest
 
