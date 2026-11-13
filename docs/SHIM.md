@@ -50,3 +50,18 @@ no Windows/Wine on this host. Windows runtime verification rides on CI (windows-
   full Win32 reimplementation. POA's compat-shim is narrower: it targets the
   **POSIX subset that source uses**, translated at build time (source) or at
   runtime (compat-runtime, clearly labeled).
+
+## What actually runs where (read before claiming "compat-shim port")
+
+**Current reality, as of Nov 2026:** source-ports built by POA today link against
+**MinGW-w64's own libc**, not `poa_shim` — zig cc's Windows target brings a complete
+POSIX-ish layer (paths, errno, mkstemp, etc. already exist there). So the
+"compat-shim" lane's success does not exercise poa_shim at all yet.
+
+**Where poa_shim pays off:** builds that must link the MSVC CRT / UCRT instead
+(Windows-native MSVC, or zig's `-target x86_64-windows-msvc`), or POSIX surfaces
+MinGW-w64 lacks. It is spare infrastructure until M3 needs it. It is never the
+reason a PoA "compat-shim" port works — that success belongs to MinGW-w64.
+
+**Claim hygiene for reports:** a report from this lane must not credit poa_shim
+for outcomes from MinGW-w64. If the shim is wired in later, the report must say so.
