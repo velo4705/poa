@@ -14,8 +14,9 @@
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const repo = path.resolve(new URL("..", import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const doom = process.env.DOOM_SRC ?? "/tmp/opencode/chocolate-doom";
 const wad = process.env.WAD ?? "/tmp/opencode/freedoom-0.13.0/freedoom2.wad";
 const work = process.env.POA_M1_WORK ?? "/tmp/opencode/m1-smoke-work";

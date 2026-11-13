@@ -12,8 +12,9 @@ import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const repo = path.resolve(new URL("..", import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const doom = process.env.DOOM_SRC ?? "/tmp/opencode/chocolate-doom";
 const work = process.env.POA_M1_WORK ?? "/tmp/opencode/m1-work";
 mkdirSync(work, { recursive: true });

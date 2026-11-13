@@ -14,8 +14,9 @@
 import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const repo = path.resolve(new URL("..", import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const src = process.env.LIBARCHIVE_SRC ?? "/tmp/opencode/libarchive";
 const target = process.env.POA_TARGET ?? "windows-x86_64-mingw";
 const work = process.env.POA_M2_WORK ?? "/tmp/opencode/m2-libarchive-work";

@@ -11,8 +11,9 @@
 import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const repo = path.resolve(new URL("..", import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const zstd = process.env.ZSTD_SRC ?? "/tmp/opencode/zstd";
 const work = process.env.POA_M2_WORK ?? "/tmp/opencode/m2-work";
 mkdirSync(work, { recursive: true });
