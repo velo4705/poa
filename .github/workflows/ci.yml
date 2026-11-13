@@ -60,6 +60,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci && npm run build
+      - name: diagnostic — cmake + minimal configure
+        shell: bash
+        run: |
+          echo "=== cmake --version ==="; cmake --version || echo "cmake: NOT FOUND"
+          echo "=== zig --version ==="; zig version || echo "zig: NOT FOUND (OK on windows-native lane)"
+          echo "=== minimal cmake configure ==="
+          mkdir -p /tmp/poa-ci-diag && cd /tmp/poa-ci-diag
+          printf 'cmake_minimum_required(VERSION 3.16)\nproject(poaci-diag C)\nadd_executable(poaci-diag main.c)\n' > CMakeLists.txt
+          printf 'int main(void){return 0;}\n' > main.c
+          cmake -S . -B build -GNinja 2>&1 && cmake --build build 2>&1 && echo "MINIMAL CMAKE: OK" || echo "MINIMAL CMAKE: FAILED rc=$? (diagnostic only — not gating)"
       - name: clone zstd v1.5.7 (BSD)
         shell: bash
         run: git clone --depth 1 --branch v1.5.7 https://github.com/facebook/zstd.git "$GITHUB_WORKSPACE/zstd"
@@ -84,6 +94,15 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci && npm run build
+      - name: diagnostic — cmake + minimal configure
+        run: |
+          echo "=== cmake --version ==="; cmake --version || echo "cmake: NOT FOUND"
+          echo "=== zig --version ==="; zig version || echo "zig: NOT FOUND (OK on windows-native lane)"
+          echo "=== minimal cmake configure ==="
+          mkdir -p /tmp/poa-ci-diag && cd /tmp/poa-ci-diag
+          printf 'cmake_minimum_required(VERSION 3.16)\nproject(poaci-diag C)\nadd_executable(poaci-diag main.c)\n' > CMakeLists.txt
+          printf 'int main(void){return 0;}\n' > main.c
+          cmake -S . -B build -GNinja 2>&1 && cmake --build build 2>&1 && echo "MINIMAL CMAKE: OK" || echo "MINIMAL CMAKE: FAILED rc=$? (diagnostic only — not gating)"
       - name: clone libarchive
         run: git clone --depth 1 https://github.com/libarchive/libarchive.git "$GITHUB_WORKSPACE/libarchive"
       - name: build bsdtar.exe via POA (cross → windows-x86_64-mingw)
@@ -134,6 +153,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci && npm run build
+      - name: diagnostic — cmake + minimal configure
+        shell: bash
+        run: |
+          echo "=== cmake --version ==="; cmake --version || echo "cmake: NOT FOUND"
+          echo "=== zig --version ==="; zig version || echo "zig: NOT FOUND (OK on windows-native lane)"
+          echo "=== minimal cmake configure ==="
+          mkdir -p /tmp/poa-ci-diag && cd /tmp/poa-ci-diag
+          printf 'cmake_minimum_required(VERSION 3.16)\nproject(poaci-diag C)\nadd_executable(poaci-diag main.c)\n' > CMakeLists.txt
+          printf 'int main(void){return 0;}\n' > main.c
+          cmake -S . -B build -GNinja 2>&1 && cmake --build build 2>&1 && echo "MINIMAL CMAKE: OK" || echo "MINIMAL CMAKE: FAILED rc=$? (diagnostic only — not gating)"
       - name: download SQLite amalgamation 3.54.1 (SHA3-256 pinned)
         run: |
           curl -sLo amalgamation.zip https://sqlite.org/2026/sqlite-amalgamation-3540100.zip
@@ -164,6 +193,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci && npm run build
+      - name: diagnostic — cmake + minimal configure
+        shell: bash
+        run: |
+          echo "=== cmake --version ==="; cmake --version || echo "cmake: NOT FOUND"
+          echo "=== zig --version ==="; zig version || echo "zig: NOT FOUND (OK on windows-native lane)"
+          echo "=== minimal cmake configure ==="
+          mkdir -p /tmp/poa-ci-diag && cd /tmp/poa-ci-diag
+          printf 'cmake_minimum_required(VERSION 3.16)\nproject(poaci-diag C)\nadd_executable(poaci-diag main.c)\n' > CMakeLists.txt
+          printf 'int main(void){return 0;}\n' > main.c
+          cmake -S . -B build -GNinja 2>&1 && cmake --build build 2>&1 && echo "MINIMAL CMAKE: OK" || echo "MINIMAL CMAKE: FAILED rc=$? (diagnostic only — not gating)"
       - name: download SQLite amalgamation 3.54.1 (SHA3-256 pinned)
         shell: bash
         run: |
@@ -192,6 +231,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci && npm run build
+      - name: diagnostic — cmake + minimal configure
+        shell: bash
+        run: |
+          echo "=== cmake --version ==="; cmake --version || echo "cmake: NOT FOUND"
+          echo "=== zig --version ==="; zig version || echo "zig: NOT FOUND (OK on windows-native lane)"
+          echo "=== minimal cmake configure ==="
+          mkdir -p /tmp/poa-ci-diag && cd /tmp/poa-ci-diag
+          printf 'cmake_minimum_required(VERSION 3.16)\nproject(poaci-diag C)\nadd_executable(poaci-diag main.c)\n' > CMakeLists.txt
+          printf 'int main(void){return 0;}\n' > main.c
+          cmake -S . -B build -GNinja 2>&1 && cmake --build build 2>&1 && echo "MINIMAL CMAKE: OK" || echo "MINIMAL CMAKE: FAILED rc=$? (diagnostic only — not gating)"
       - name: download SQLite amalgamation 3.54.1 (SHA3-256 pinned)
         run: |
           curl -sLo amalgamation.zip https://sqlite.org/2026/sqlite-amalgamation-3540100.zip
