@@ -95,6 +95,18 @@ Still to do (M2 gate):
 - `poa.scan_dependencies` — `DT_NEEDED`, PE import tables, WASM imports → closure diff
 - Cross-build matrix in CI: {Linux, Windows} × {x86_64, aarch64}
 
+Gate evidence so far (all through POA's own pipeline, no source edits):
+- zstd v1.5.7 → windows-x86_64 PE (MZ verified, via `poa.build` + zig-windows-gnu toolchain)
+- SQLite 3.54.1 amalgamation → native run on Linux (`--version` + `select 1+1` → 2),
+  Windows PE built; CI windows-latest lane runs it natively
+- Chocolate DOOM DEMO1 replayed headlessly under qemu-user on aarch64 (2664 gametics, Freedoom BSD)
+- libarchive v1.7.x (unmodified, CMake) → 762/762 targets; bsdtar/bsdcat/bsdcpio/bsdunzip
+  PE built and magic-verified; windows lane runs bsdtar --version
+- 2 of 8 corpus projects done (zstd, sqlite, libarchive = 3 actually); runtime-verified on
+  Linux only — Windows runtime still rides CI windows-latest
+
+Tracked proof: docs/m1-port-report.json; scripts/m{1,2}-*.mjs drivers; CI matrix above.
+
 **Committed tier:** `LOSSLESS` for CLI/server-class C/C++ projects whose own test
 suites pass on both OSes (target: ≥ 8 license-clean projects from a public corpus,
 e.g. coreutils-class utilities, vim/neovim, sqlite tools)
