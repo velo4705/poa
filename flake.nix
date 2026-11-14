@@ -25,6 +25,8 @@
             pkgs.pkgsCross.mingwW64.buildPackages.binutils
             # wine64 (minimal) — verify Windows PE binaries end-to-end on Linux
             pkgs.wine64Packages.minimal
+            # python3 with jinja2 for mbedtls test-data generation scripts
+            (pkgs.python3.withPackages (ps: [ ps.jinja2 ps.jsonschema ]))
           ];
 
           shellHook = ''
