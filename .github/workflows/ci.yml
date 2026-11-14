@@ -247,6 +247,7 @@ jobs:
           export MBEDTLS_SRC="$GITHUB_WORKSPACE/mbedtls"
           export POA_TARGET="windows-x86_64-mingw"
           export POA_M2_WORK="$RUNNER_TEMP/poa-mbedtls-work"
+          export PATH="$RUNNER_TEMP/poa-venv/Scripts:$PATH"
           node scripts/m2-mbedtls.mjs
 
   mbedtls-poa-windows:
@@ -255,9 +256,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install cmake, ninja, python + venv packages
+        shell: pwsh
         run: |
-          brew install cmake ninja
-          python3 -m pip install --user jinja2 jsonschema
+          choco install cmake ninja python -y
+          python -m venv "$env:RUNNER_TEMP/poa-venv"
+          & "$env:RUNNER_TEMP/poa-venv/Scripts/python.exe" -m pip install --quiet jinja2 jsonschema
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -286,7 +289,8 @@ jobs:
       - name: install cmake, ninja, python + deps
         run: |
           brew install cmake ninja
-          python3 -m pip install --user jinja2 jsonschema
+          python3 -m venv /tmp/poa-mbedtls-venv
+          /tmp/poa-mbedtls-venv/bin/pip install --quiet jinja2 jsonschema
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -303,6 +307,7 @@ jobs:
           export MBEDTLS_SRC="$GITHUB_WORKSPACE/mbedtls"
           export POA_TARGET="macos-aarch64"
           export POA_M2_WORK="$RUNNER_TEMP/poa-mbedtls-work"
+          export PATH="/tmp/poa-mbedtls-venv/bin:$PATH"
           node scripts/m2-mbedtls.mjs
 
   sqlite-poa-ubuntu:
