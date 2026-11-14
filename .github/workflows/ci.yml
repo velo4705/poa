@@ -151,6 +151,78 @@ jobs:
           export POA_M2_WORK="$RUNNER_TEMP/poa-libarchive-work"
           node scripts/m2-compat-libarchive.mjs
 
+  cmark-poa-ubuntu:
+    name: cmark — POA build, ubuntu → windows-x86_64 cross (zig)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone cmark
+        run: git clone --depth 1 https://github.com/commonmark/cmark.git "$GITHUB_WORKSPACE/cmark"
+      - name: build cmark via POA (cross → windows-x86_64-mingw)
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export CMARK_SRC="$GITHUB_WORKSPACE/cmark"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-cmark-work"
+          node scripts/m2-compat-cmark.mjs
+
+  cmark-poa-windows:
+    name: cmark — POA build, windows-x86_64 (native, runs cmark --version)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        shell: pwsh
+        run: choco install cmake ninja -y
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone cmark
+        run: git clone --depth 1 https://github.com/commonmark/cmark.git "$env:GITHUB_WORKSPACE/cmark"
+        shell: pwsh
+      - name: build + run cmark via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export CMARK_SRC="$GITHUB_WORKSPACE/cmark"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-cmark-work"
+          node scripts/m2-compat-cmark.mjs
+
+  cmark-poa-macos:
+    name: cmark — POA build, macos-aarch64 (native, runs cmark --version)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        run: brew install cmake ninja
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone cmark
+        run: git clone --depth 1 https://github.com/commonmark/cmark.git "$GITHUB_WORKSPACE/cmark"
+      - name: build + run cmark via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export CMARK_SRC="$GITHUB_WORKSPACE/cmark"
+          export POA_TARGET="macos-aarch64"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-cmark-work"
+          node scripts/m2-compat-cmark.mjs
+
   sqlite-poa-ubuntu:
     name: sqlite — POA build, ubuntu → windows-x86_64 cross (zig)
     runs-on: ubuntu-latest
