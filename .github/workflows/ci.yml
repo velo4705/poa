@@ -223,6 +223,88 @@ jobs:
           export POA_M2_WORK="$RUNNER_TEMP/poa-cmark-work"
           node scripts/m2-compat-cmark.mjs
 
+  mbedtls-poa-ubuntu:
+    name: mbedtls — POA build, ubuntu → windows-x86_64 cross (zig)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja, python + deps
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build python3-jinja2 python3-jsonschema
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone Mbed TLS (recursive submodules)
+        run: |
+          git clone https://github.com/Mbed-TLS/mbedtls.git "$GITHUB_WORKSPACE/mbedtls"
+          cd "$GITHUB_WORKSPACE/mbedtls" && git submodule update --init --recursive
+      - name: build Mbed TLS via POA (cross → windows-x86_64-mingw)
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export MBEDTLS_SRC="$GITHUB_WORKSPACE/mbedtls"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-mbedtls-work"
+          node scripts/m2-mbedtls.mjs
+
+  mbedtls-poa-windows:
+    name: mbedtls — POA build, windows-x86_64 (native, runs verifier)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja, python
+        shell: pwsh
+        run: |
+          choco install cmake ninja python -y
+          python -m pip install jinja2 jsonschema
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone Mbed TLS (recursive submodules)
+        run: |
+          git clone https://github.com/Mbed-TLS/mbedtls.git "$GITHUB_WORKSPACE/mbedtls"
+          cd "$GITHUB_WORKSPACE/mbedtls" && git submodule update --init --recursive
+        shell: pwsh
+      - name: build Mbed TLS via POA, run PSA SHA-256 verifier
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export MBEDTLS_SRC="$GITHUB_WORKSPACE/mbedtls"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-mbedtls-work"
+          node scripts/m2-mbedtls.mjs
+
+  mbedtls-poa-macos:
+    name: mbedtls — POA build, macos-aarch64 (native, runs verifier)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja, python + deps
+        run: |
+          brew install cmake ninja
+          python3 -m pip install --user jinja2 jsonschema
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone Mbed TLS (recursive submodules)
+        run: |
+          git clone https://github.com/Mbed-TLS/mbedtls.git "$GITHUB_WORKSPACE/mbedtls"
+          cd "$GITHUB_WORKSPACE/mbedtls" && git submodule update --init --recursive
+      - name: build Mbed TLS via POA, run PSA SHA-256 verifier
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export MBEDTLS_SRC="$GITHUB_WORKSPACE/mbedtls"
+          export POA_TARGET="macos-aarch64"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-mbedtls-work"
+          node scripts/m2-mbedtls.mjs
+
   sqlite-poa-ubuntu:
     name: sqlite — POA build, ubuntu → windows-x86_64 cross (zig)
     runs-on: ubuntu-latest
