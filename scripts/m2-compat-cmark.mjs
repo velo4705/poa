@@ -102,7 +102,7 @@ const hostArchMatchesTarget =
   (process.platform === "darwin" && declaredTarget.startsWith("macos")) ||
   (process.platform === "win32" && declaredTarget.startsWith("windows")) ||
   (process.platform === "linux" && declaredTarget.startsWith("linux"));
-const hostArchMap: Record<string, string> = { x64: "x86_64", arm64: "aarch64", ia32: "i386" };
+const hostArchMap = { x64: "x86_64", arm64: "aarch64", ia32: "i386" };
 const archMatches = declaredTarget.includes(hostArchMap[process.arch] ?? process.arch);
 
 if (hostArchMatchesTarget && archMatches) {

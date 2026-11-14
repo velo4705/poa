@@ -89,6 +89,28 @@ await call("poa.start_port", {
   strategy: "cross-compile",
 });
 
+// Point cmake at our venv python — its Python3_FIND_STRATEGY LOCATION prefers
+// system paths like the brew framework python, which lacks jsonschema.
+// Allows the driver to honour POA_PYTHON (or PATH's python3) as the interpreter.
+const pyCandidates = process.env.POA_PYTHON
+  ? [process.env.POA_PYTHON]
+  : (process.platform === "win32"
+      ? ["C:\\Program Files\\Python312\\python.exe", "C:\\Program Files\\Python313\\python.exe", "python", "python3"]
+      : ["/tmp/poa-mbedtls-venv/bin/python3", "/tmp/poa-mbedtls-venv/bin/python", "python3", "python"]);
+let python = null;
+for (const c of pyCandidates) {
+  try {
+    const stdout = execFileSync(c, ["-c", "import jinja2, jsonschema; print('ok')"], { encoding: "utf8", timeout: 10000 });
+    if (stdout.trim() === "ok") { python = c; break; }
+  } catch (e) { /* intentional silent-ignore */ }
+}
+if (!python) {
+  console.error("no python with jinja2+jsonschema on PATH found; set POA_PYTHON to override");
+  server.kill();
+  process.exit(2);
+}
+console.log("using python:", python);
+
 const build = await call("poa.build", {
   mode: "auto", // native on windows-latest, cross on ubuntu via POA_CMAKE_TOOLCHAIN_FILE
   cmakeArgs: [
@@ -96,6 +118,7 @@ const build = await call("poa.build", {
     "-DENABLE_TESTING=OFF",
     "-DBUILD_SHARED_LIBS=OFF",
     "-DCMAKE_BUILD_TYPE=Release",
+    `-DPython3_EXECUTABLE=${python}`,
   ],
 });
 if (!build.ok) {
