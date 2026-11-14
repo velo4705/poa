@@ -369,7 +369,13 @@ export async function verifyPort(
   await fs.access(artifact);
 
   const timeoutMs = opts.timeoutMs ?? TIMEOUT_VERIFY_MS;
-  const crossRun = target.arch !== hostArch();
+  // Cross-run when either arch or OS-family mismatches the host — not only when arch differs.
+  const hostOsIsWindows = process.platform === "win32";
+  const hostOsIsDarwin = process.platform === "darwin";
+  const targetIsWindows = target.os === "windows";
+  const targetIsDarwin = target.os === "darwin";
+  const osMismatch = hostOsIsWindows !== targetIsWindows || hostOsIsDarwin !== targetIsDarwin;
+  const crossRun = osMismatch || target.arch !== hostArch();
   const args = opts.args ?? [];
 
   if (crossRun && target.arch !== "wasm32") {

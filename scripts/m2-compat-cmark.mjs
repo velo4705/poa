@@ -96,26 +96,36 @@ if (!cmarkExe) {
   server.kill();
   process.exit(3);
 }
-// On Linux, we cannot run a Windows PE natively — verify MZ signature instead.
-// On Windows, run cmark --version via poa.verify and assert exit 0.
-const head = Buffer.alloc(2);
-const fd = process.platform !== "win32" ? await import("node:fs").then((fs) => fs.promises.open(cmarkExe, "r")) : null;
-if (fd) {
-  await fd.read(head, 0, 2, 0);
-  await fd.close();
-  console.log("cmark PE magic:", JSON.stringify(head.toString("latin1")), "(expect MZ)");
-  if (head.toString("latin1") !== "MZ") {
-    console.error("cmark artifact is not a PE");
-    server.kill();
-    process.exit(4);
-  }
-}
-if (process.platform === "win32") {
+// The target declared for this run (e.g. 'windows-x86_64-mingw', 'macos-aarch64', 'linux-x86_64-generic')
+const declaredTarget = process.env.POA_TARGET ?? "windows-x86_64-mingw";
+const hostArchMatchesTarget =
+  (process.platform === "darwin" && declaredTarget.startsWith("macos")) ||
+  (process.platform === "win32" && declaredTarget.startsWith("windows")) ||
+  (process.platform === "linux" && declaredTarget.startsWith("linux"));
+const hostArchMap: Record<string, string> = { x64: "x86_64", arm64: "aarch64", ia32: "i386" };
+const archMatches = declaredTarget.includes(hostArchMap[process.arch] ?? process.arch);
+
+if (hostArchMatchesTarget && archMatches) {
   const verify = await call("poa.verify", { artifact: cmarkExe, args: ["--version"], timeoutMs: 15000 });
   const ok = verify.outcome === "passed";
-  console.log(`\nCMARK LANE: ${ok ? "PASS — native windows run" : "NATIVE RUN FAIL"}`);
+  console.log(`\nCMARK LANE: ${ok ? "PASS — native run" : "NATIVE RUN FAIL"}`);
   server.kill();
   process.exit(ok ? 0 : 4);
+}
+
+// Cross-compile: binary is for a foreign OS/arch — verify embedded-libav magic, e.g. "MZ" for PE
+const { promises: fsp } = await import("node:fs");
+const fh = await fsp.open(cmarkExe, "r");
+const head = Buffer.alloc(4);
+await fh.read(head, 0, 4, 0);
+await fh.close();
+console.log("cmark artifact magic:", JSON.stringify(head));
+const isPe = head[0] === 0x4d && head[1] === 0x5a;
+const isElf = head.readUInt32LE(0) === 0x464c457f;
+if (!isPe && !isElf) {
+  console.error("artifact magic not PE or ELF; unrecognized");
+  server.kill();
+  process.exit(4);
 }
 server.kill();
 process.exit(0);
