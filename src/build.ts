@@ -171,7 +171,14 @@ async function findElfArtifacts(dir: string, max = 20): Promise<Array<{ path: st
         await fh.close();
         const isElf = magic.readUInt32LE(0) === 0x464c457f;
         const isPe = magic[0] === 0x4d && magic[1] === 0x5a; // "MZ"
-        if (isElf || isPe) {
+        // Mach-O: 0xfeedfacf = 64-bit arm64 LE, 0xfeedface = 32-bit, 0xcefaedfe/0xcafebabe = BE
+        const machLE = magic.readUInt32LE(0);
+        const machBE = magic.readUInt32BE(0);
+        const isMachO =
+          machLE === 0xfeedfacf || machLE === 0xfeedface ||
+          machBE === 0xfeedfacf || machBE === 0xfeedface ||
+          machLE === 0xcafebabe || machBE === 0xcafebabe; // universal/fat
+        if (isElf || isPe || isMachO) {
           const m = await ingest(p);
           out.push({ path: p, arch: m.arch });
         }

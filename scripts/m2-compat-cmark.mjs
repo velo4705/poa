@@ -89,7 +89,7 @@ if (!build.ok) {
 }
 await call("poa.get_report", {});
 
-const cmarkExe = (build.artifacts ?? []).find((a) => /[\\/]src[\\/]cmark.exe$/.test(a.path))?.path;
+const cmarkExe = (build.artifacts ?? []).find((a) => /[\\/]src[\\/]cmark(\.exe)?$/.test(a.path))?.path;
 console.log("cmark artifact:", cmarkExe ?? "(none)");
 if (!cmarkExe) {
   console.error("M2 failed to locate src/cmark.exe in the build output");

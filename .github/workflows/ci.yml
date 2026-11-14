@@ -254,11 +254,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: install cmake, ninja, python
-        shell: pwsh
+      - name: install cmake, ninja, python + venv packages
         run: |
-          choco install cmake ninja python -y
-          python -m pip install jinja2 jsonschema
+          brew install cmake ninja
+          python3 -m pip install --user jinja2 jsonschema
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -276,6 +275,7 @@ jobs:
           export MBEDTLS_SRC="$GITHUB_WORKSPACE/mbedtls"
           export POA_TARGET="windows-x86_64-mingw"
           export POA_M2_WORK="$RUNNER_TEMP/poa-mbedtls-work"
+          export PATH="$RUNNER_TEMP/poa-venv/Scripts:$PATH"
           node scripts/m2-mbedtls.mjs
 
   mbedtls-poa-macos:
