@@ -75,7 +75,7 @@ await call("poa.start_port", {
 await call("poa.choose_strategy", {});
 await call("poa.detect_buildsystem", {});
 const build = await call("poa.build", {
-  mode: "cross",
+  mode: "auto", // native MSVC on windows-latest, zig cross on ubuntu-latest
   cmakeArgs: [
     "-DZSTD_BUILD_SHARED=OFF",
     "-DZSTD_BUILD_STATIC=ON",
