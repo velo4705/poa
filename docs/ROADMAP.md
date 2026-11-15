@@ -74,7 +74,11 @@ Chocolate DOOM's SDL1 renderer or build server-mode first — don't rathole.
 **Goal:** prove "exclusive port, converted, looks identical" for the case that
 happens *today*: same-ISA C/C++ porting between Linux and Windows.
 
-Landed (v0.3.0):
+Five of eight corpus assignments from the "prove Linux↔Windows parity" gate are real.
+Remaining candidates (cmark-gfm, libzip, jansson, cJSON-via-CMakeWrapper) not committed —
+deciding based on what's actually useful, not on meeting the number.
+
+Landed (v0.4.0):
 - `poa.choose_strategy` — evidence-driven decision ladder (source→native LOSSLESS,
   source+arch→cross NEAR-LOSSLESS, binary same-ISA→compat-shim DEGRADED,
   binary cross-ISA→lift-to-IR/DBT DEGRADED, WASM→runtime, iOS-policy→impossible)
@@ -102,8 +106,11 @@ Gate evidence so far (all through POA's own pipeline, no source edits):
 - Chocolate DOOM DEMO1 replayed headlessly under qemu-user on aarch64 (2664 gametics, Freedoom BSD)
 - libarchive (unmodified) → 762/762 targets; bsdtar/bsdcat/bsdcpio/bsdunzip PE built;
   runtime-verify via wine64 (bsdtar 3.9.0 runs; create→list→extract roundtrip verified)
-- 2 of 8 corpus projects done (zstd, sqlite, libarchive = 3 actually); runtime-verified on
-  Linux only — Windows runtime still rides CI windows-latest
+- 5 of 8 corpus projects done, CI-verified across all three OSes:
+  zstd v1.5.7 · SQLite 3.54.1 · libarchive · cmark · Mbed TLS.
+  Windows native + Linux cross both run via zig-cross; Windows native run validated
+  by CI driver (poa.verify on windows-latest). Runtime-verified on macOS only via POA native.
+  Run verified via wine64 on Linux for all five (PE execution test).
 
 Tracked proof: docs/m1-port-report.json; scripts/m{1,2}-*.mjs drivers; CI matrix above.
 
