@@ -166,8 +166,8 @@ if (!tf || !mbedX509 || !mbedcrypto || !mbedtls) {
 
 // For cross-compiles (Linux → windows-x86_64-mingw) the system cc lacks the
 // mingw libs; use the same zig-cc wrapper the toolchain used.
-const isWindowsTarget = target.includes("windows") && process.platform !== "win32";
-const cc = isWindowsTarget
+const isWindowsTarget = target.includes("windows") || target.includes("mingw");
+const cc = (isWindowsTarget && process.platform !== "win32")
   ? path.join(repo, "scripts", "zig-cross", "x86_64-windows-gnu-cc")
   : (process.env.CC ?? (process.platform === "win32" ? "gcc" : "cc"));
 
