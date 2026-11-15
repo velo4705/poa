@@ -101,7 +101,16 @@ let python = null;
 for (const c of pyCandidates) {
   try {
     const stdout = execFileSync(c, ["-c", "import jinja2, jsonschema; print('ok')"], { encoding: "utf8", timeout: 10000 });
-    if (stdout.trim() === "ok") { python = c; break; }
+    if (stdout.trim() === "ok") {
+      // Convert command name to absolute path — passing "python" to cmake means
+      // cmake re-does its own PATH search and can land on a managed-toolbox python
+      // that lacks our deps. Returning an absolute path pins the correct interpreter.
+      try {
+        python = execFileSync(process.platform === "win32" ? "where.exe" : "which", [c], { encoding: "utf8" })
+          .split(/\r?\n/)[0].trim();
+      } catch { python = c; }
+      break;
+    }
   } catch (e) { /* intentional silent-ignore */ }
 }
 if (!python) {
