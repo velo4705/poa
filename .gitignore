@@ -1,5 +1,19 @@
+# Build artifacts
 node_modules/
 dist/
 *.log
+
+# Local working directories
 .poa/
+wineprefix/
+.DS_Store
+
+# Temp / scratch files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Tooling
 poa-shim-test*

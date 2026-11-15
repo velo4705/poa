@@ -13,11 +13,11 @@ drives the pipeline; POA does the mechanical 60–90% and reports the rest.
 
 ## Status
 
-**M0 + M1 complete.** POA ports source trees to other platforms end-to-end:
-Chocolate DOOM (x86-64 host) was produced as a **static aarch64-linux-musl**
-binary and ran under qemu-user (`--version` → `Chocolate Doom 3.1.1`, exit 0) —
-driven entirely by POA's own MCP tools. Evidence: `docs/m1-port-report.json`.
-Next: M2 — Linux ↔ Windows parity (see `docs/ROADMAP.md`).
+M0 + M1 complete: POA ports source trees to other platforms end-to-end
+(Chocolate DOOM → aarch64 via POA's own MCP tools, verified by DEMO1 replay).
+M2 — Linux ↔ Windows parity — is mostly there: 5 of 8 corpus projects
+build and verify natively on Linux, macOS and Windows (zstd, SQLite,
+libarchive, cmark, Mbed TLS). See `docs/ROADMAP.md` for the gate criteria.
 
 ## How It Works — Three Layers
 
@@ -60,6 +60,10 @@ POA exposes its four stages as MCP tools:
 | `poa.build` | 3 | CMake-driven native/cross build (fixed argv, no arbitrary shells); emits artifact archs |
 | `poa.verify` | 4 | Native or qemu-user run; records pass/fail/timeout into the report |
 | `poa.plan_port` | 1–3 | Full plan + port report JSON |
+| `poa.choose_strategy` | 2 | Evidence-driven decision ladder with fidelity tiers (LOSSLESS / NEAR-LOSSLESS / DEGRADED) |
+| `poa.scan_dependencies` | ingest | ELF (readelf) · PE (objdump) · WASM (import-section scan) — Mach-O reports unsupported honestly |
+| `poa.sessions` / `poa.session_switch` | session | Cross-project registry: list and switch between ports mid-session |
+| `poa.finish_port` | session | Close verified ("keep") or abandon — refuses to call unverified work done |
 
 ## Legal & Ethical Scope
 
@@ -89,11 +93,15 @@ Wire into OpenCode (`opencode.json`):
   "mcp": {
     "poa": {
       "type": "local",
-      "command": ["node", "/home/nix/Projects/poa/dist/server.js"]
+      "command": ["node", "/absolute/path/to/dist/server.js"]
     }
   }
 }
 ```
+
+For OpenCode the `opencode.json` path is resolved relative to the project's
+directory — see [docs/USAGE.md](docs/USAGE.md) for the OpenCode-specific
+snippet and project-vs-global registration.
 
 ## Repository Layout
 
@@ -106,12 +114,15 @@ src/session.ts      # port sessions: .poa/port.json + append-only port-log.jsonl
 src/build.ts        # poa.build + poa.verify — CMake orchestration & qemu/native harness
 src/report.ts       # PortReport type — every run emits one, success or not
 src/server.ts       # MCP stdio server wiring the tools together
+shim/poa_shim.*     # C shim for the Win32↔POSIX gap (poa_strerror not built yet)
 scripts/smoke.mjs   # full stdio smoke test (session lifecycle included)
 scripts/m1-doom.mjs # M1 gate driver: DOOM → aarch64 via POA's own tools
 scripts/m1-sdl2.sh  # one-time static SDL2 build for zig cross toolchain
 scripts/zig-cross/  # zig cc wrappers + cmake toolchain for aarch64-linux-musl
 docs/               # architecture, milestone roadmap, M1 port report, acceptance vision
 flake.nix           # dev shell: node, cmake, ninja, qemu-user, zig (all binary-cached)
+LICENSE-MIT         # one half of the dual license
+LICENSE-APACHE-2.0  # the other half — see package.json "license" field
 ```
 
 See `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/USAGE.md`.
