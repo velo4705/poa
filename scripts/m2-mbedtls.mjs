@@ -116,6 +116,7 @@ const build = await call("poa.build", {
   cmakeArgs: [
     "-DENABLE_PROGRAMS=OFF",
     "-DENABLE_TESTING=OFF",
+    "-DGEN_FILES=ON",
     "-DBUILD_SHARED_LIBS=OFF",
     "-DCMAKE_BUILD_TYPE=Release",
     `-DPython3_EXECUTABLE=${python}`,

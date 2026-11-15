@@ -254,10 +254,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: install cmake, ninja, python + venv packages
+      - name: install cmake, ninja, python, perl + venv packages
         shell: pwsh
         run: |
-          choco install cmake ninja python -y
+          choco install cmake ninja python strawberryperl -y
           python -m venv "$env:RUNNER_TEMP/poa-venv"
           & "$env:RUNNER_TEMP/poa-venv/Scripts/python.exe" -m pip install --quiet jinja2 jsonschema
       - uses: actions/setup-node@v4
@@ -265,15 +265,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci && npm run build
-      - name: clone Mbed TLS (recursive submodules, verify)
+      - name: clone Mbed TLS (recursive submodules)
         shell: bash
         run: |
           git clone --recurse-submodules https://github.com/Mbed-TLS/mbedtls.git "$GITHUB_WORKSPACE/mbedtls"
-          echo "=== submodule status (recursive) ==="; git -C "$GITHUB_WORKSPACE/mbedtls" submodule status --recursive
-          echo "=== core files ==="; ls "$GITHUB_WORKSPACE/mbedtls/tf-psa-crypto/core/psa_crypto.c" && ls "$GITHUB_WORKSPACE/mbedtls/library/error.c"
-          echo "=== library dirs ==="; ls "$GITHUB_WORKSPACE/mbedtls/library" | head -10
-          echo "=== tf-psa-crypto/core ==="; ls "$GITHUB_WORKSPACE/mbedtls/tf-psa-crypto/core" | head -10
-          echo "=== framework ==="; ls "$GITHUB_WORKSPACE/mbedtls/framework" | head -10
         
 
       - name: build Mbed TLS via POA, run PSA SHA-256 verifier
