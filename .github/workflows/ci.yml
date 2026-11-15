@@ -268,8 +268,8 @@ jobs:
       - run: npm ci && npm run build
       - name: clone Mbed TLS (recursive submodules)
         run: |
-          git clone https://github.com/Mbed-TLS/mbedtls.git "$GITHUB_WORKSPACE/mbedtls"
-          cd "$GITHUB_WORKSPACE/mbedtls" && git submodule update --init --recursive
+          git clone https://github.com/Mbed-TLS/mbedtls.git "$env:GITHUB_WORKSPACE/mbedtls"
+          Set-Location "$env:GITHUB_WORKSPACE/mbedtls"; git submodule update --init --recursive
         shell: pwsh
       - name: build Mbed TLS via POA, run PSA SHA-256 verifier
         shell: bash
