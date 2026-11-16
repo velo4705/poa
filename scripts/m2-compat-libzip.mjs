@@ -69,11 +69,14 @@ await call("poa.start_port", { source: src, target, provenance: "open-source", s
 const build = await call("poa.build", {
   mode: "auto",
   cmakeArgs: [
-    // NOTE: -D on cmake only sets *cmake cache variables*; to inject compiler
-    // macros they have to live inside -DCMAKE_C_FLAGS (one argv element —
-    // spaces inside it survive because children are spawned without a shell).
+    // NOTE: -DCMAKE_C_FLAGS carries compiler macros (one argv element — spaces
+    // inside it survive because children are spawned without a shell).
+    // The libzip escaping bug is fixed at the source by scripts/ci-patches/patch-libzip-escape.py
     "-DBUILD_SHARED_LIBS=OFF",
-    "-DWIN32=OFF",
+    "-DBUILD_TOOLS=OFF",
+    "-DBUILD_OSSFUZZ=OFF",
+    "-DBUILD_EXAMPLES=OFF",
+    "-DBUILD_DOC=OFF",
     "-DCMAKE_C_FLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=0 -DDWORD_MAX=0xFFFFFFFF",
     "-DENABLE_ZSTD=OFF",
     "-DENABLE_BZIP2=OFF",

@@ -481,9 +481,6 @@ jobs:
           cmake --install /tmp/opencode/zlib-build
       - name: clone libzip
         run: git clone --depth 1 https://github.com/nih-at/libzip.git "$GITHUB_WORKSPACE/libzip"
-      - name: fix libzip escape for cross-compilation
-        run: python3 "$GITHUB_WORKSPACE/scripts/ci-patches/patch-libzip-escape.py" "$GITHUB_WORKSPACE/libzip"
-        shell: bash
       - name: build libzip via POA (cross → windows-x86_64-mingw)
         shell: bash
         run: |
@@ -520,9 +517,6 @@ jobs:
       - name: clone libzip
         run: git clone --depth 1 https://github.com/nih-at/libzip.git "$env:GITHUB_WORKSPACE/libzip"
         shell: pwsh
-      - name: fix libzip escape for cross-compilation (upstream assumes cmd.exe but Linux expels)
-        run: python3 "$GITHUB_WORKSPACE/scripts/ci-patches/patch-libzip-escape.py" "$GITHUB_WORKSPACE/libzip"
-        shell: bash
       - name: build + run libzip via POA
         shell: bash
         run: |

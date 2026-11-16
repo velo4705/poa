@@ -1,10 +1,5 @@
 set(CMAKE_SYSTEM_NAME Windows)
 
-# Cross-compiling to Windows from Linux: force WIN32 off inside scripts which
-# use it to choose a command-line escaping strategy (e.g. libzip GenerateCommandTable.cmake).
-# Native Windows hosts unaffected.
-set(WIN32 FALSE)
-
 set(CMAKE_SYSTEM_PROCESSOR AMD64)
 set(CMAKE_C_COMPILER "$ENV{POA_ROOT}/scripts/zig-cross/x86_64-windows-gnu-cc")
 set(CMAKE_CXX_COMPILER "$ENV{POA_ROOT}/scripts/zig-cross/x86_64-windows-gnu-c++")
