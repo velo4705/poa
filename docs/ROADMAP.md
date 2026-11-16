@@ -77,7 +77,7 @@ happens *today*: same-ISA C/C++ porting between Linux and Windows.
 Eight corpus assignments complete — all verified end-to-end on Linux/macOS/Windows:
 zstd · SQLite · libarchive · cmark · Mbed TLS · cJSON · jansson · libzip.
 
-Landed (v0.4.0):
+Landed (v1.1.1):
 - `poa.choose_strategy` — evidence-driven decision ladder (source→native LOSSLESS,
   source+arch→cross NEAR-LOSSLESS, binary same-ISA→compat-shim DEGRADED,
   binary cross-ISA→lift-to-IR/DBT DEGRADED, WASM→runtime, iOS-policy→impossible)

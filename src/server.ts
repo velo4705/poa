@@ -12,7 +12,8 @@
  */
 
 import { promises as fs } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -42,8 +43,12 @@ import {
   type Provenance,
 } from "./session.js";
 import type { PortReport, PortStatus } from "./report.js";
+import { readFileSync } from "node:fs";
 
-const VERSION = "0.4.0";
+// Version comes from package.json — single source of truth, so npm
+// version bumps show up here without recompiling or maintaining parallel.
+const pkg = JSON.parse(readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "package.json"), "utf8")) as { version: string };
+const VERSION = pkg.version;
 let rootDir = resolveProjectRoot();
 
 const server = new McpServer({ name: "poa", version: VERSION });

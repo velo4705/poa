@@ -1,7 +1,10 @@
 # Build artifacts
 node_modules/
 dist/
-*.log
+*.tsbuildinfo
+
+# Nix dev shell — flake.lock IS committed; flake.local is not
+flake.local
 
 # Local working directories
 .poa/
@@ -14,10 +17,14 @@ wineprefix/
 *.swp
 *.swo
 *~
+/tmp/
 
-# Tooling
+# Tooling output
+*.log
 poa-shim-test*
 test-poa.zip
+
+# Native artifacts — never commit
 *.o
 *.obj
 *.class
@@ -29,3 +36,10 @@ test-poa.zip
 *.a
 *.pdb
 *.rc.obj
+*.d
+*.gch
+*.gcda
+*.gcno
+
+# User-local MCP config — example file is committed
+opencode.json

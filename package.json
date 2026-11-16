@@ -1,7 +1,7 @@
 {
   "name": "@poa/mcp",
   "version": "1.1.1",
-  "description": "POA (Port Anything) MCP server — port software binaries, source, and firmware to other devices.",
+  "description": "POA (Port Anything) MCP server \u2014 port software binaries, source, and firmware to other devices.",
   "license": "MIT OR Apache-2.0",
   "type": "module",
   "bin": {
@@ -9,7 +9,12 @@
   },
   "files": [
     "dist",
-    "docs"
+    "docs",
+    "LICENSE-MIT",
+    "LICENSE-APACHE-2.0",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "opencode.example.json"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
