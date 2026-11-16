@@ -38,7 +38,13 @@ const notify = (method, params) => server.stdin.write(JSON.stringify({ jsonrpc: 
 const call = async (name, args) => {
   const r = await send("tools/call", { name, arguments: args });
   const t = r.result?.content?.[0]?.text ?? "";
-  console.log(`\n== ${name} ==`); console.log(t.length > 1500 ? t.slice(0, 1500) + "\n…[truncated]" : t);
+  console.log(`\n== ${name} ==`);
+  const lines = t.split("\n");
+  const errLines = lines.filter((l) => /error|FAILED|undefined symbol|not found/i.test(l));
+  if (errLines.length) {
+    for (const l of errLines) console.log("  ↳ " + l);
+  }
+  console.log(t.length > 2000 ? "…[head truncated]\n" + t.slice(-2000) : t);
   try { return JSON.parse(t); } catch { return t; }
 };
 

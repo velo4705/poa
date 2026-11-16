@@ -475,6 +475,7 @@ jobs:
           export POA_ROOT="$GITHUB_WORKSPACE"
           export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
           cmake -S "$GITHUB_WORKSPACE/zlib" -B /tmp/opencode/zlib-build -GNinja \
+            -DCMAKE_TOOLCHAIN_FILE="$POA_CMAKE_TOOLCHAIN_FILE" \
             -DCMAKE_BUILD_TYPE=Release -DZLIB_BUILD_SHARED=OFF -DCMAKE_INSTALL_PREFIX=/tmp/opencode/zlocal -DZLIB_BUILD_TESTING=OFF
           cmake --build /tmp/opencode/zlib-build
           cmake --install /tmp/opencode/zlib-build

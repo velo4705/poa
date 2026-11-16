@@ -52,7 +52,9 @@ const call = async (name, args) => {
   const r = await send("tools/call", { name, arguments: args });
   const text = r.result?.content?.[0]?.text ?? "";
   console.log(`\n== ${name} ==`);
-  console.log(text.length > 1500 ? text.slice(0, 1500) + "\n…[truncated]" : text);
+  const errLines = text.split("\n").filter((l) => /error|FAILED|undefined symbol|not found/i.test(l));
+  if (errLines.length) for (const l of errLines) console.log("  ↳ " + l);
+  console.log(text.length > 2000 ? "…[head truncated]\n" + text.slice(-2000) : text);
   try { return JSON.parse(text); } catch { return text; }
 };
 

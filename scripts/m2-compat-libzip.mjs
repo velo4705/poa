@@ -55,7 +55,10 @@ const notify = (method, params) => server.stdin.write(JSON.stringify({ jsonrpc: 
 const call = async (name, args) => {
   const r = await send("tools/call", { name, arguments: args });
   const t = r.result?.content?.[0]?.text ?? "";
-  console.log(`\n== ${name} ==`); console.log(t.length > 1500 ? t.slice(0, 1500) + "\n…[truncated]" : t);
+  console.log(`\n== ${name} ==`);
+  const errLines = t.split("\n").filter((l) => /error|FAILED|undefined symbol|not found/i.test(l));
+  if (errLines.length) for (const l of errLines) console.log("  ↳ " + l);
+  console.log(t.length > 2000 ? "…[head truncated]\n" + t.slice(-2000) : t);
   try { return JSON.parse(t); } catch { return t; }
 };
 
@@ -72,6 +75,13 @@ const build = await call("poa.build", {
     "-DBUILD_SHARED_LIBS=OFF",
     "-DWIN32=OFF",
     "-DCMAKE_C_FLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=0 -DDWORD_MAX=0xFFFFFFFF",
+    "-DENABLE_ZSTD=OFF",
+    "-DENABLE_BZIP2=OFF",
+    "-DENABLE_LZMA=OFF",
+    "-DENABLE_LZ4=OFF",
+    "-DENABLE_GNUTLS=OFF",
+    "-DENABLE_OPENSSL=OFF",
+    "-DENABLE_READLINE=OFF",
     `-DZLIB_ROOT=${zlocal}`,
     `-DZLIB_INCLUDE_DIR=${zlocal}/include`,
     `-DZLIB_LIBRARY=${zlibLib}`,
