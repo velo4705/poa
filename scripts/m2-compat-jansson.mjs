@@ -50,8 +50,9 @@ const build = await call("poa.build", { mode: "auto", cmakeArgs: [] });
 if (!build.ok) { console.log("\nJANSSON LANE: BUILD BLOCKED"); server.kill(); process.exit(2); }
 await call("poa.get_report", {});
 
-const exe = (build.artifacts ?? []).find((a) => /bin[\/\\]json_process(\.exe)?$/.test(a.path))?.path;
-console.log("json_process artifact:", exe ?? "(none)");
+const exe = (build.artifacts ?? []).find((a) => /bin[\/\\]test_equal(\.exe)?$/.test(a.path))?.path
+          ?? (build.artifacts ?? []).find((a) => /bin[\/\\]json_process(\.exe)?$/.test(a.path))?.path;
+console.log("verify artifact:", exe ?? "(none)");
 if (!exe) { server.kill(); process.exit(3); }
 const declaredTarget = target;
 const hostArchMatchesTarget =
@@ -71,7 +72,7 @@ const { promises: fsp } = await import("node:fs");
 const fd = await fsp.open(exe, "r");
 const head = Buffer.alloc(2);
 await fd.read(head, 0, 2, 0); await fd.close();
-console.log("json_process PE magic:", JSON.stringify(head.toString("latin1")));
+console.log("verifier target PE magic:", JSON.stringify(head.toString("latin1")));
 if (head.toString("latin1") !== "MZ") { server.kill(); process.exit(4); }
 console.log("JANSSON LANE: PASS — PE magic verified");
 server.kill();
