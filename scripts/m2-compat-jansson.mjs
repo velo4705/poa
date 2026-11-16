@@ -3,7 +3,7 @@
  * Verification: `bin/<target>/json_process.exe` run by poa.verify wait=1.
  */
 import { spawn, execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,6 +15,7 @@ if (!existsSync(path.join(src, "CMakeLists.txt"))) {
   console.error("jansson source not found at", src);
   process.exit(2);
 }
+mkdirSync(work, { recursive: true });
 
 const server = spawn(process.execPath, [path.join(repo, "dist/server.js")], { cwd: work });
 let buf = ""; const pending = new Map(); let id = 0;

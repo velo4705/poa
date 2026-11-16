@@ -66,11 +66,12 @@ await call("poa.start_port", { source: src, target, provenance: "open-source", s
 const build = await call("poa.build", {
   mode: "auto",
   cmakeArgs: [
+    // NOTE: -D on cmake only sets *cmake cache variables*; to inject compiler
+    // macros they have to live inside -DCMAKE_C_FLAGS (one argv element —
+    // spaces inside it survive because children are spawned without a shell).
     "-DBUILD_SHARED_LIBS=OFF",
     "-DWIN32=OFF",
-    "-D_GNU_SOURCE=ON",
-    "-D_FORTIFY_SOURCE=0",
-    "-DDWORD_MAX=0xFFFFFFFF",
+    "-DCMAKE_C_FLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=0 -DDWORD_MAX=0xFFFFFFFF",
     `-DZLIB_ROOT=${zlocal}`,
     `-DZLIB_INCLUDE_DIR=${zlocal}/include`,
     `-DZLIB_LIBRARY=${zlibLib}`,
@@ -95,16 +96,17 @@ if (!libDir) {
   server.kill();
   process.exit(3);
 }
+// zipconf.h is generated into the build root, not <build>/lib
+const genDir = path.dirname(libDir);
 
 const cc = process.platform === "win32" || process.platform === "darwin"
   ? (process.env.CC ?? "gcc")
   : path.join(repo, "scripts/zig-cross/x86_64-windows-gnu-cc");
-const out = path.join(work, process.platform === "win32" || process.platform === "darwin" ? "zip-check.exe" : "zip-check.exe");
-const isNative = target.includes(process.platform === "darwin" ? "macos" : process.platform === "win32" ? "windows" : "linux");
+const out = path.join(work, "zip-check.exe");
 try {
   execFileSync(cc, [
     `-I${src}/lib`,
-    `-I${libDir}`,
+    `-I${genDir}`,
     `-I${zlocal}/include`,
     "-o", out,
     path.join(repo, "scripts/zlib-zip-check.c"),
