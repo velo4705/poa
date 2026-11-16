@@ -17,3 +17,15 @@ wineprefix/
 
 # Tooling
 poa-shim-test*
+test-poa.zip
+*.o
+*.obj
+*.class
+*.dylib
+*.so
+*.dll
+*.exe
+*.lib
+*.a
+*.pdb
+*.rc.obj
