@@ -20,6 +20,7 @@
             pkgs.ninja
             pkgs.qemu        # qemu-aarch64 for poa.verify
             pkgs.zig         # zig cc cross-compiler (aarch64-linux-musl, static)
+            pkgs.zlib        # libzip dependency — REQUIRED by libzip (and other C projects)
             # windres (x86_64-w64-mingw32-windres) for .rc resource files —
             # zig cannot build them, but binutils wrapper is small and cached.
             pkgs.pkgsCross.mingwW64.buildPackages.binutils

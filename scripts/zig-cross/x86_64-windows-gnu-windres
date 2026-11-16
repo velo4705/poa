@@ -11,4 +11,9 @@ exec x86_64-w64-mingw32-windres \
   --preprocessor-arg=x86_64-windows-gnu \
   --preprocessor-arg=-x \
   --preprocessor-arg=c \
+  --preprocessor-arg=-DWINAPI_PARTITION_DESKTOP=0x00000010 \
+  --preprocessor-arg=-DWINAPI_PARTITION_APP=0x00000020 \
+  --preprocessor-arg=-DWINAPI_PARTITION_SYSTEM=0x00000040 \
+  --preprocessor-arg=-DWINAPI_PARTITION_GAMES=0xFFFFFFFF \
+  --preprocessor-arg='-DWINAPI_FAMILY_PARTITION(P)=P' \
   "$@"

@@ -309,6 +309,264 @@ jobs:
           export PATH="/tmp/poa-mbedtls-venv/bin:$PATH"
           node scripts/m2-mbedtls.mjs
 
+  cjson-poa-ubuntu:
+    name: cJSON — POA build, ubuntu → windows-x86_64 cross (zig)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone cJSON
+        run: git clone --depth 1 https://github.com/DaveGamble/cJSON.git "$GITHUB_WORKSPACE/cJSON"
+      - name: fix cJSON tests for non-MSVC compilers (upstream CMakeLists only sees MSVC)
+        run: python3 -c "import pathlib; p=pathlib.Path('$GITHUB_WORKSPACE/cJSON/tests/CMakeLists.txt'); s=p.read_text(); s=s.replace('    if("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+            target_sources(${unity_test} PRIVATE unity_setup.c)
+        endif()', '    target_sources(${unity_test} PRIVATE unity_setup.c)'); s=s.replace('            if("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+                target_sources(${cjson_utils_test} PRIVATE unity_setup.c)
+            endif()', '            target_sources(${cjson_utils_test} PRIVATE unity_setup.c)'); p.write_text(s)"
+      - name: build cJSON via POA (cross → windows-x86_64-mingw)
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export CJSON_SRC="$GITHUB_WORKSPACE/cJSON"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-cjson-work"
+          node scripts/m2-compat-cjson.mjs
+
+  cjson-poa-windows:
+    name: cJSON — POA build, windows-x86_64 (native)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        shell: pwsh
+        run: choco install cmake ninja -y
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone cJSON
+        run: git clone --depth 1 https://github.com/DaveGamble/cJSON.git "$env:GITHUB_WORKSPACE/cJSON"
+        shell: pwsh
+      - name: build + run cJSON via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export CJSON_SRC="$GITHUB_WORKSPACE/cJSON"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-cjson-work"
+          node scripts/m2-compat-cjson.mjs
+
+  cjson-poa-macos:
+    name: cJSON — POA build, macos-aarch64 (native)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        run: brew install cmake ninja
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone cJSON
+        run: git clone --depth 1 https://github.com/DaveGamble/cJSON.git "$GITHUB_WORKSPACE/cJSON"
+      - name: build + run cJSON via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export CJSON_SRC="$GITHUB_WORKSPACE/cJSON"
+          export POA_TARGET="macos-aarch64"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-cjson-work"
+          node scripts/m2-compat-cjson.mjs
+
+  jansson-poa-ubuntu:
+    name: jansson — POA build, ubuntu → windows-x86_64 cross (zig)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone jansson
+        run: git clone --depth 1 https://github.com/akheron/jansson.git "$GITHUB_WORKSPACE/jansson"
+      - name: build jansson via POA (cross → windows-x86_64-mingw)
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export JANSSON_SRC="$GITHUB_WORKSPACE/jansson"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-jansson-work"
+          node scripts/m2-compat-jansson.mjs
+
+  jansson-poa-windows:
+    name: jansson — POA build, windows-x86_64 (native)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        shell: pwsh
+        run: choco install cmake ninja -y
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone jansson
+        run: git clone --depth 1 https://github.com/akheron/jansson.git "$env:GITHUB_WORKSPACE/jansson"
+        shell: pwsh
+      - name: build + run jansson via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export JANSSON_SRC="$GITHUB_WORKSPACE/jansson"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-jansson-work"
+          node scripts/m2-compat-jansson.mjs
+
+  jansson-poa-macos:
+    name: jansson — POA build, macos-aarch64 (native)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        run: brew install cmake ninja
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone jansson
+        run: git clone --depth 1 https://github.com/akheron/jansson.git "$GITHUB_WORKSPACE/jansson"
+      - name: build + run jansson via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export JANSSON_SRC="$GITHUB_WORKSPACE/jansson"
+          export POA_TARGET="macos-aarch64"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-jansson-work"
+          node scripts/m2-compat-jansson.mjs
+
+  libzip-poa-ubuntu:
+    name: libzip — POA build, ubuntu → windows-x86_64 cross (zig)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zig, cmake, ninja
+        run: sudo apt-get update && sudo apt-get install -y zig cmake ninja-build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone zlib
+        run: git clone --depth 1 https://github.com/madler/zlib.git "$GITHUB_WORKSPACE/zlib"
+      - name: build zlib (needed for libzip)
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          cmake -S "$GITHUB_WORKSPACE/zlib" -B /tmp/opencode/zlib-build -GNinja \
+            -DCMAKE_BUILD_TYPE=Release -DZLIB_BUILD_SHARED=OFF -DCMAKE_INSTALL_PREFIX=/tmp/opencode/zlocal -DZLIB_BUILD_TESTING=OFF
+          cmake --build /tmp/opencode/zlib-build
+          cmake --install /tmp/opencode/zlib-build
+      - name: clone libzip
+        run: git clone --depth 1 https://github.com/nih-at/libzip.git "$GITHUB_WORKSPACE/libzip"
+      - name: fix libzip escape for cross-compilation
+        run: python3 -c "import pathlib; p = pathlib.Path('$GITHUB_WORKSPACE/libzip/cmake/GenerateCommandTable.cmake'); s = p.read_text(); s = s.replace('  if(NOT WIN32)
+    string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
+  else()
+    set(SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
+  endif()', '  string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")'); p.write_text(s)"
+        shell: bash
+      - name: build libzip via POA (cross → windows-x86_64-mingw)
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export POA_CMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/scripts/zig-cross/windows-gnu-toolchain.cmake"
+          export LIBZIP_SRC="$GITHUB_WORKSPACE/libzip"
+          export ZLIB_ROOT=/tmp/opencode/zlocal
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-libzip-work"
+          node scripts/m2-compat-libzip.mjs
+
+  libzip-poa-windows:
+    name: libzip — POA build, windows-x86_64 (native)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        shell: pwsh
+        run: choco install cmake ninja -y
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone zlib
+        run: git clone --depth 1 https://github.com/madler/zlib.git "$env:GITHUB_WORKSPACE/zlib"
+        shell: pwsh
+      - name: build zlib
+        shell: pwsh
+        run: |
+          cmake -S "$env:GITHUB_WORKSPACE/zlib" -B zlib-build -GNinja -DCMAKE_BUILD_TYPE=Release -DZLIB_BUILD_SHARED=OFF -DCMAKE_INSTALL_PREFIX="C:\zlocal" -DZLIB_BUILD_TESTING=OFF
+          cmake --build zlib-build
+          cmake --install zlib-build
+      - name: clone libzip
+        run: git clone --depth 1 https://github.com/nih-at/libzip.git "$env:GITHUB_WORKSPACE/libzip"
+        shell: pwsh
+      - name: fix libzip escape for cross-compilation (upstream assumes cmd.exe but Linux expels)
+        run: python3 -c "import pathlib; p = pathlib.Path('$env:GITHUB_WORKSPACE/libzip/cmake/GenerateCommandTable.cmake'); s = p.read_text(); s = s.replace('  if(NOT WIN32)
+    string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
+  else()
+    set(SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
+  endif()', '  string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")'); p.write_text(s)"
+        shell: bash
+      - name: build + run libzip via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export LIBZIP_SRC="$GITHUB_WORKSPACE/libzip"
+          export ZLIB_ROOT="/c/zlocal"
+          export POA_TARGET="windows-x86_64-mingw"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-libzip-work"
+          node scripts/m2-compat-libzip.mjs
+
+  libzip-poa-macos:
+    name: libzip — POA build, macos-aarch64 (native)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install cmake, ninja
+        run: brew install cmake ninja zlib
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci && npm run build
+      - name: clone libzip
+        run: git clone --depth 1 https://github.com/nih-at/libzip.git "$GITHUB_WORKSPACE/libzip"
+      - name: build + run libzip via POA
+        shell: bash
+        run: |
+          export POA_ROOT="$GITHUB_WORKSPACE"
+          export LIBZIP_SRC="$GITHUB_WORKSPACE/libzip"
+          export ZLIB_ROOT="$(brew --prefix zlib)"
+          export POA_TARGET="macos-aarch64"
+          export POA_M2_WORK="$RUNNER_TEMP/poa-libzip-work"
+          node scripts/m2-compat-libzip.mjs
+
   sqlite-poa-ubuntu:
     name: sqlite — POA build, ubuntu → windows-x86_64 cross (zig)
     runs-on: ubuntu-latest
