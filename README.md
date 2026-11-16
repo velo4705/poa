@@ -51,15 +51,18 @@ what breaks."* Watch the log and the port report together.
 
 ## How it works
 
-POA drives three layers, each an MCP tool set:
+```
+┌────────────┐    ┌────────────┐    ┌────────────┐
+│  Ingest it │ →  │  Plan it   │ →  │  Build &   │
+│  classifies│    │  maps what │    │  run it     │
+│  ELF / PE  │    │  breaks    │    │  verifies   │
+│  or source │    │  honestly  │    │  artifacts  │
+└────────────┘    └────────────┘    └────────────┘
+```
 
-1. **Ingest** — classify what you gave it (ELF/PE/Mach-O/source tree/firmware image).
-2. **Plan** — diff what the software needs against what the target offers;
-   each gap is tagged `auto`, `needs-adapter`, or `needs-human`.
-3. **Build & verify** — build with the target's toolchain, then run it.
-
-The agent decides, calls POA, reads the port report POA prints, and does the
-real work. POA rejects fake completions:
+Your agent drives the three steps — classifying what you gave it, mapping
+what it needs vs. what your target offers, and building & running it — then
+reads the port report POA prints. POA rejects fake completions:
 
 - If the build fails, it says so.
 - If a degradation is unavoidable, it makes you declare it explicitly.
