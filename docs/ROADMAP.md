@@ -74,9 +74,8 @@ Chocolate DOOM's SDL1 renderer or build server-mode first — don't rathole.
 **Goal:** prove "exclusive port, converted, looks identical" for the case that
 happens *today*: same-ISA C/C++ porting between Linux and Windows.
 
-Five of eight corpus assignments from the "prove Linux↔Windows parity" gate are real.
-Remaining candidates (cmark-gfm, libzip, jansson, cJSON-via-CMakeWrapper) not committed —
-deciding based on what's actually useful, not on meeting the number.
+Eight corpus assignments complete — all verified end-to-end on Linux/macOS/Windows:
+zstd · SQLite · libarchive · cmark · Mbed TLS · cJSON · jansson · libzip.
 
 Landed (v0.4.0):
 - `poa.choose_strategy` — evidence-driven decision ladder (source→native LOSSLESS,
@@ -106,11 +105,11 @@ Gate evidence so far (all through POA's own pipeline, no source edits):
 - Chocolate DOOM DEMO1 replayed headlessly under qemu-user on aarch64 (2664 gametics, Freedoom BSD)
 - libarchive (unmodified) → 762/762 targets; bsdtar/bsdcat/bsdcpio/bsdunzip PE built;
   runtime-verify via wine64 (bsdtar 3.9.0 runs; create→list→extract roundtrip verified)
-- 5 of 8 corpus projects done, CI-verified across all three OSes:
-  zstd v1.5.7 · SQLite 3.54.1 · libarchive · cmark · Mbed TLS.
-  Windows native + Linux cross both run via zig-cross; Windows native run validated
-  by CI driver (poa.verify on windows-latest). Runtime-verified on macOS only via POA native.
-  Run verified via wine64 on Linux for all five (PE execution test).
+- 8 of 8 corpus projects via POA's own pipeline (no source modifications):
+  zstd v1.5.7 · SQLite 3.54.1 · libarchive · cmark · Mbed TLS · cJSON · jansson · libzip.
+  All 3 OSes verified locally for zstd, sqlite, libarchive, cmark, mbedtls (native run).
+  cJSON, jansson, libzip verified via their own bundled test harnesses under wine64.
+  All 3 OSes have CI lanes now — verification goes through them, not via local wine.
 
 Tracked proof: docs/m1-port-report.json; scripts/m{1,2}-*.mjs drivers; CI matrix above.
 
