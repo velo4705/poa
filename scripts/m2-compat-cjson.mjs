@@ -20,7 +20,7 @@ if (!existsSync(path.join(src, "CMakeLists.txt"))) {
 const verifier = path.join(repo, "scripts/cjson-roundtrip.c");
 mkdirSync(work, { recursive: true });
 
-const server = spawn("node", [path.join(repo, "dist/server.js")], { cwd: work });
+const server = spawn(process.execPath, [path.join(repo, "dist/server.js")], { cwd: work });
 let buf = "";
 const pending = new Map();
 let id = 0;
@@ -63,13 +63,26 @@ console.log("server:", init.result?.serverInfo);
 notify("notifications/initialized", {});
 
 await call("poa.start_port", { source: src, target, provenance: "open-source", strategy: "cross-compile" });
-const build = await call("poa.build", { mode: "auto", cmakeArgs: ["-DENABLE_CJSON_TEST=OFF"] });
+const build = await call("poa.build", { mode: "auto", cmakeArgs: ["-DENABLE_CJSON_TEST=OFF", "-DBUILD_SHARED_LIBS=OFF"] });
 if (!build.ok) { console.log("\nCJSON LANE: BUILD BLOCKED"); server.kill(); process.exit(2); }
 await call("poa.get_report", {});
 
-const libPath = [path.join(work, ".poa", "build",
-                           (build.artifacts ?? [])[0]?.path.match(/\.poa\/build\/([^/\\]+)/)?.[1] ?? "",
-                           "libcjson.a")];
+import { readdirSync, existsSync as ex2 } from "node:fs";
+const buildRoot = path.join(work, ".poa", "build");
+let libPath = null;
+try {
+  for (const d of readdirSync(buildRoot, { withFileTypes: true })) {
+    if (!d.isDirectory()) continue;
+    const c = path.join(buildRoot, d.name, "libcjson.a");
+    if (ex2(c)) { libPath = [c]; break; }
+  }
+} catch { /* fall through to error below */ }
+if (!libPath) {
+  console.error("could not locate libcjson.a under", buildRoot);
+  console.error("candidate dirs:", (() => { try { return readdirSync(buildRoot); } catch { return []; } })());
+  server.kill();
+  process.exit(3);
+}
 
 const cc = process.env.POA_TARGET && process.env.POA_TARGET.startsWith("windows") && process.platform !== "win32"
   ? path.join(repo, "scripts/zig-cross/x86_64-windows-gnu-cc")

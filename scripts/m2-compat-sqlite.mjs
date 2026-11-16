@@ -28,7 +28,7 @@ if (!existsSync(path.join(src, "sqlite3.c"))) {
 }
 mkdirSync(work, { recursive: true });
 
-const server = spawn("node", [path.join(repo, "dist/server.js")], { cwd: work });
+const server = spawn(process.execPath, [path.join(repo, "dist/server.js")], { cwd: work });
 let buf = "";
 const pending = new Map();
 let id = 0;

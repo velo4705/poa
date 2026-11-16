@@ -19,7 +19,7 @@ const doom = process.env.DOOM_SRC ?? "/tmp/opencode/chocolate-doom";
 const work = process.env.POA_M1_WORK ?? "/tmp/opencode/m1-work";
 mkdirSync(work, { recursive: true });
 
-const server = spawn("node", [path.join(repo, "dist/server.js")], { cwd: work });
+const server = spawn(process.execPath, [path.join(repo, "dist/server.js")], { cwd: work });
 let buf = "";
 const pending = new Map();
 let id = 0;

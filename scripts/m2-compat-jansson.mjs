@@ -16,7 +16,7 @@ if (!existsSync(path.join(src, "CMakeLists.txt"))) {
   process.exit(2);
 }
 
-const server = spawn("node", [path.join(repo, "dist/server.js")], { cwd: work });
+const server = spawn(process.execPath, [path.join(repo, "dist/server.js")], { cwd: work });
 let buf = ""; const pending = new Map(); let id = 0;
 server.stdout.on("data", (d) => {
   buf += d.toString();

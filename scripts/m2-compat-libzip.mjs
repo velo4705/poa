@@ -16,13 +16,25 @@ if (!existsSync(path.join(src, "CMakeLists.txt"))) {
   console.error("libzip source not found at", src);
   process.exit(2);
 }
+// Locate a zlib static lib: our zig-cross build produces libzs.a;
+// brew (macOS) produces libz.a; explicit ZLIB_LIBRARY env wins.
+const zlibLib = (() => {
+  if (process.env.ZLIB_LIBRARY && existsSync(process.env.ZLIB_LIBRARY)) return process.env.ZLIB_LIBRARY;
+  for (const cand of ["libzs.a", "libz.a"]) {
+    const p2 = path.join(zlocal, "lib", cand);
+    if (existsSync(p2)) return p2;
+  }
+  // brew stores it under lib too; on failure tell the user exactly what's missing
+  console.error("no zlib static lib in", zlocal, "/lib (looked for libzs.a, libz.a)");
+  process.exit(2);
+})();
 if (!existsSync(path.join(zlocal, "include"))) {
   console.error("local zlib not found at", zlocal, "— build with: git clone --depth 1 https://github.com/madler/zlib && cmake --install");
   process.exit(2);
 }
 mkdirSync(work, { recursive: true });
 
-const server = spawn("node", [path.join(repo, "dist/server.js")], { cwd: work });
+const server = spawn(process.execPath, [path.join(repo, "dist/server.js")], { cwd: work });
 let buf = ""; const pending = new Map(); let id = 0;
 server.stdout.on("data", (d) => {
   buf += d.toString();
@@ -56,20 +68,33 @@ const build = await call("poa.build", {
   cmakeArgs: [
     "-DBUILD_SHARED_LIBS=OFF",
     "-DWIN32=OFF",
-    "-D_GNU_SOURCE",
+    "-D_GNU_SOURCE=ON",
     "-D_FORTIFY_SOURCE=0",
     "-DDWORD_MAX=0xFFFFFFFF",
     `-DZLIB_ROOT=${zlocal}`,
     `-DZLIB_INCLUDE_DIR=${zlocal}/include`,
-    `-DZLIB_LIBRARY=${zlocal}/lib/libzs.a`,
+    `-DZLIB_LIBRARY=${zlibLib}`,
   ],
 });
 if (!build.ok) { console.log("\nLIBZIP LANE: BUILD BLOCKED"); server.kill(); process.exit(2); }
 await call("poa.get_report", {});
 
-const buildId = (build.artifacts ?? [])[0]?.path.match(/\.poa\/build\/([^/\\]+)/)?.[1];
-const libDir = buildId ? path.join(work, ".poa", "build", buildId, "lib") : null;
-if (!libDir) { console.error("could not locate lib/ build dir"); server.kill(); process.exit(3); }
+const { readdirSync, existsSync: ex2 } = await import("node:fs");
+const buildRoot = path.join(work, ".poa", "build");
+let libDir = null;
+try {
+  for (const d of readdirSync(buildRoot, { withFileTypes: true })) {
+    if (!d.isDirectory()) continue;
+    const c = path.join(buildRoot, d.name, "lib", "libzip.a");
+    if (ex2(c)) { libDir = path.join(buildRoot, d.name, "lib"); break; }
+  }
+} catch { /* fall through */ }
+if (!libDir) {
+  console.error("could not locate lib/libzip.a under", buildRoot);
+  console.error("candidate dirs:", (() => { try { return readdirSync(buildRoot); } catch { return []; } })());
+  server.kill();
+  process.exit(3);
+}
 
 const cc = process.platform === "win32" || process.platform === "darwin"
   ? (process.env.CC ?? "gcc")
@@ -84,7 +109,7 @@ try {
     "-o", out,
     path.join(repo, "scripts/zlib-zip-check.c"),
     path.join(libDir, "libzip.a"),
-    `${zlocal}/lib/libzs.a`,
+    zlibLib,
     ...(target.includes("windows") || target.includes("mingw") ? ["-lbcrypt"] : []),
   ], { stdio: "inherit" });
 } catch (err) { console.error("zip-check link failed:", err?.message ?? err); server.kill(); process.exit(6); }

@@ -9,7 +9,7 @@ const inspectPath = process.env.POA_INSPECT ?? "/bin/ls";
 console.log("inspecting:", inspectPath);
 console.log("session cwd:", sessionCwd, "| repo:", serverCwd);
 
-const server = spawn("node", [path.join(serverCwd, "dist/server.js")], { cwd: sessionCwd });
+const server = spawn(process.execPath, [path.join(serverCwd, "dist/server.js")], { cwd: sessionCwd });
 let buf = "";
 const pending = new Map();
 let id = 0;
