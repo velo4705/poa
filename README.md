@@ -1,135 +1,94 @@
 # POA — Port Anything
 
-**POA is an MCP server that turns software binaries and source into ports for
-other devices** — without losing more quality than the target physically allows.
+**POA ports software between platforms.** You give it a program — your own
+code, an open-source project, a Windows `.exe` — and it produces a build for
+whatever target you ask for: Linux from Windows, ARM64 from x86-64, and so on.
 
-Games, apps, firmware — from phones and PCs to TVs and unusual hardware.
+It is not an AI that invents ports. Your coding agent does the hard parts;
+POA is the set of tools your agent calls to do them honestly and mechanically.
 
-> POA does not promise "no quality loss." It promises the *best achievable
-> fidelity for the target*, with every degradation explicit and documented.
+**POA doesn't promise "no quality loss."** It promises the best fidelity the
+target allows, with every loss explicit and documented — never hidden.
 
-An MCP server, deliberately: an agent (OpenCode, Claude Code, any MCP client)
-drives the pipeline; POA does the mechanical 60–90% and reports the rest.
+## What it will and won't do
 
-## Status
+- ✅ Port C/C++ **source** to another OS or architecture (same code, new build)
+- ✅ Cross-compile from Linux to Windows via a clean toolchain (`zig cc`)
+- ✅ Verify a port runs, using the target's own tests or a native/qemu smoke run
+- ✅ Report exactly what didn't make it, so humans decide what to chase
+- ❌ Lift a binary to a different platform by magic — POA refuses to pretend
+- ❌ Bypass DRM, anti-cheat, or platform licensing — it's out of scope, firmly
 
-M0 + M1 complete, M2 in progress, CI green:
+## Who this is for
 
-- **M1**: Chocolate DOOM → aarch64 source port built via POA's own MCP tools,
-  verified under qemu-user (`--version` passes, DEMO1 replay passed earlier).
-- **M2**: 8 of 8 license-clean corpus projects all pass in CI on Linux
-  (cross → windows-x86_64 PE via zig cc), Windows (native build + verify),
-  and macOS (native Mach-O + verify). zstd · SQLite · libarchive · cmark ·
-  Mbed TLS · cJSON · jansson · libzip.
-- **M3+**: not implemented yet; POA's translation engine honestly reports
-  itself as missing rather than guessing.
+- You maintain software and want to ship it on another platform without
+  rewriting it.
+- You want your coding agent to attempt a port and tell you what worked, what
+  didn't, and what needs a human — in one pass, not a month of diffs.
+- You want the gaps documented, not guessed at.
 
-See `docs/ROADMAP.md` for the full milestone plan.
+## Quick start
 
-## How It Works — Three Layers
-
-```
-┌──────────────┐   ┌───────────────────┐   ┌──────────────────┐
-│  INGESTION   │──▶│   CORE TRANSLATOR │──▶│ TARGET ADAPTERS  │
-│  ("anything")│   │  (platform-free)  │   │   ("anywhere")   │
-└──────────────┘   └───────────────────┘   └──────────────────┘
-```
-
-1. **Ingestion** — classify the input (source / binary / assets / firmware). ✅ real (`poa.inspect_input`)
-2. **Core Translator** — lower to a portable representation (LLVM IR / WASM). ❌ not built yet
-3. **Target Adapters** — one adapter per device; adding a target ≠ re-porting the app. ❌ not built yet
-
-Sub-ecosystems: **POA-Games** · **POA-Apps** · **POA-Embedded** · **POA-Assets**.
-
-## The Agent Loop
-
-POA exposes its four stages as MCP tools:
-
-1. **Environment Scouting** — `poa.scout_target`: probe the target's limits
-   (CPU, RAM, OS, GPU, peripherals).
-2. **Discrepancy Mapping** — `poa.plan_port` (stages 1–3): diff what the input
-   needs vs. what the target has; each gap tagged `auto | needs-adapter | needs-human`.
-3. **Translation** — ❌ not implemented; reports itself as a blocker, honestly.
-4. **Autonomous Debugging** — ❌ not implemented; will run a test harness per port.
-
-## Tools
-
-| Tool | Stage | What it does |
-|---|---|---|
-| `poa.list_targets` | — | Built-in + user-registered target profiles |
-| `poa.scout_target` | 1 | Full profile of one target |
-| `poa.inspect_input` | ingest | Byte-level classification → Port Manifest (ELF/PE/Mach-O/WASM/ZIP/firmware/source trees) |
-| `poa.detect_buildsystem` | 1 | Build-system candidates with confidence + cross-compile strategy |
-| `poa.add_target` | — | Register a custom target (your fridge here), zod-validated |
-| `poa.start_port` / `poa.port_status` | session | Open/track a port in `.poa/` (CWD-scoped, git-ignored inputs stay yours) |
-| `poa.get_report` / `poa.declare_degradation` | session | Machine-readable port report; declared (never hidden) losses |
-| `poa.request_human` / `poa.resolve_escalation` | escalation | Structured one-question escalations with options |
-| `poa.build` | 3 | CMake-driven native/cross build (fixed argv, no arbitrary shells); emits artifact archs |
-| `poa.verify` | 4 | Native or qemu-user run; records pass/fail/timeout into the report |
-| `poa.plan_port` | 1–3 | Full plan + port report JSON |
-| `poa.choose_strategy` | 2 | Evidence-driven decision ladder with fidelity tiers (LOSSLESS / NEAR-LOSSLESS / DEGRADED) |
-| `poa.scan_dependencies` | ingest | ELF (readelf) · PE (objdump) · WASM (import-section scan) — Mach-O reports unsupported honestly |
-| `poa.sessions` / `poa.session_switch` | session | Cross-project registry: list and switch between ports mid-session |
-| `poa.finish_port` | session | Close verified ("keep") or abandon — refuses to call unverified work done |
-
-## Legal & Ethical Scope
-
-POA operates on software **you have the right to port**: your own code,
-open-source software, or binaries you're licensed to modify or redistribute.
-POA is not a circumvention tool. No DRM removal, no anti-cheat bypass.
-Console targets require platform-holder SDK access.
-
-## Usage
-
-Short version: the agent drives POA; the state lives in the project root's
-`.poa/`; the input can live anywhere. Full walkthrough — new session, existing
-session, multi-project, concurrency — in **`docs/USAGE.md`**.
-
-## Quick Start
+Requirements: Node ≥ 18. On Linux, `nix develop` gives you a working dev
+shell (node, cmake, ninja, qemu-user, zig — all binary-cached); on other
+OSes, bring your own.
 
 ```sh
 npm install
 npm run build
-node scripts/smoke.mjs   # end-to-end stdio test (initialize, tools/list, tools/call)
+node scripts/smoke.mjs     # end-to-end sanity test of the MCP server
 ```
 
-Wire into OpenCode — `opencode.example.json` in this repo is a working snippet
-you can drop into your project or global config:
+Wire it into your MCP client. For OpenCode, copy `opencode.example.json` to
+`opencode.json`, point it at this repo's `dist/server.js`, and restart:
 
-```sh
-cp opencode.example.json opencode.json
-# edit the absolute path to dist/server.js
+```json
+{ "mcp": { "poa": { "type": "local", "command": ["node", "/path/to/poa/dist/server.js"] } } }
 ```
 
-OpenCode loads it as `mcp.poa`; tools show up as `poa.*` on the next session
-start. See [docs/USAGE.md](docs/USAGE.md) for project-vs-global registration
-and session lifecycle.
+Ask your agent: *"try to port this project to windows-x86_64-mingw and report
+what breaks."* Watch the log and the port report together.
 
-## Repository Layout
+## How it works
 
-```
-src/                    # TypeScript source for the MCP server
-  targets.ts           # built-in + user-registered target profiles (zod-validated)
-  manifest.ts          # ingestion: magic-byte classification → Port Manifest
-  discrepancy.ts       # discrepancy mapper: required vs available, tagged by resolver
-  buildsystem.ts       # source-tree build-system detection
-  session.ts           # port sessions: .poa/port.json + append-only port-log.jsonl
-  build.ts             # poa.build + poa.verify — CMake orchestration & verify harness
-  report.ts            # PortReport type
-  server.ts            # MCP stdio server wiring the tools together
-shim/poa_shim.{c,h}    # C shim for the Win32↔POSIX gap, plus poa_shim_test.c
-scripts/               # CI corpus drivers + utility scripts
-  m1-doom.mjs          # M1 gate driver: DOOM → aarch64 via POA's own tools
-  m1-sdl2.sh           # one-time static SDL2 build for zig cross toolchain
-  m2-compat-*.mjs      # M2 corpus drivers (zstd, sqlite, libarchive, cmark, cjson, jansson, libzip)
-  src/                 # (legacy, for the C shim scaffold)
-  zig-cross/           # zig cc wrappers + cmake toolchain for Linux → Windows
-  ci-patches/          # inline patches for upstream CMakeLists quirks
-docs/                   # architecture, roadmap, usage, shim matrix, port reports
-flake.nix              # dev shell: node, cmake, ninja, qemu-user, zig (binary-cached)
-opencode.example.json  # working opencode.json snippet for wiring mcp.poa
-LICENSE-MIT            # one half of the dual license
-LICENSE-APACHE-2.0    # the other half — see package.json "license" / "files"
-```
+POA drives three layers, each an MCP tool set:
 
-See `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/USAGE.md`.
+1. **Ingest** — classify what you gave it (ELF/PE/Mach-O/source tree/firmware image).
+2. **Plan** — diff what the software needs against what the target offers;
+   each gap is tagged `auto`, `needs-adapter`, or `needs-human`.
+3. **Build & verify** — build with the target's toolchain, then run it.
+
+The agent decides, calls POA, reads the port report POA prints, and does the
+real work. POA rejects fake completions:
+
+- If the build fails, it says so.
+- If a degradation is unavoidable, it makes you declare it explicitly.
+- If something needs a human, it stops and asks one structured question.
+
+## Legal scope
+
+POA operates on software **you have the right to port**: your own code,
+open-source software, or software you're licensed to modify and redistribute.
+POA is not a circumvention tool. It will never remove DRM, bypass anti-cheat,
+or confer rights you don't have.
+
+## The fine print
+
+- **Source → binary**: POA compiles it. The result is as good as your source and your build.
+- **Binary → binary**: POA recompiles what it can, refuses to fake the rest.
+- **Cross-compile**: POA uses the best available cross-toolchain (zig cc),
+  with declared PE/Mach-O/ELF output verification.
+
+Quality claims are made by POA's own tests, your own test suite, or the
+project you port — not by POA's marketing.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). License: MIT OR Apache-2.0, at your choice.
+See [LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE-2.0](LICENSE-APACHE-2.0).
+
+## Using POA — more depth
+
+[USAGE.md](docs/USAGE.md) has the full walkthrough: sessions, registries,
+multi-project workflows, and concurrency. [ROADMAP.md](docs/ROADMAP.md)
+describes what's built, what's next, and what explicitly isn't promised.
