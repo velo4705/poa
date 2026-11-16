@@ -324,11 +324,8 @@ jobs:
       - name: clone cJSON
         run: git clone --depth 1 https://github.com/DaveGamble/cJSON.git "$GITHUB_WORKSPACE/cJSON"
       - name: fix cJSON tests for non-MSVC compilers (upstream CMakeLists only sees MSVC)
-        run: python3 -c "import pathlib; p=pathlib.Path('$GITHUB_WORKSPACE/cJSON/tests/CMakeLists.txt'); s=p.read_text(); s=s.replace('    if("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-            target_sources(${unity_test} PRIVATE unity_setup.c)
-        endif()', '    target_sources(${unity_test} PRIVATE unity_setup.c)'); s=s.replace('            if("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-                target_sources(${cjson_utils_test} PRIVATE unity_setup.c)
-            endif()', '            target_sources(${cjson_utils_test} PRIVATE unity_setup.c)'); p.write_text(s)"
+        run: python3 "$GITHUB_WORKSPACE/scripts/ci-patches/patch-cjson-tests.py" "$GITHUB_WORKSPACE/cJSON"
+        shell: bash
       - name: build cJSON via POA (cross → windows-x86_64-mingw)
         shell: bash
         run: |
@@ -484,11 +481,7 @@ jobs:
       - name: clone libzip
         run: git clone --depth 1 https://github.com/nih-at/libzip.git "$GITHUB_WORKSPACE/libzip"
       - name: fix libzip escape for cross-compilation
-        run: python3 -c "import pathlib; p = pathlib.Path('$GITHUB_WORKSPACE/libzip/cmake/GenerateCommandTable.cmake'); s = p.read_text(); s = s.replace('  if(NOT WIN32)
-    string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
-  else()
-    set(SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
-  endif()', '  string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")'); p.write_text(s)"
+        run: python3 "$GITHUB_WORKSPACE/scripts/ci-patches/patch-libzip-escape.py" "$GITHUB_WORKSPACE/libzip"
         shell: bash
       - name: build libzip via POA (cross → windows-x86_64-mingw)
         shell: bash
@@ -527,11 +520,7 @@ jobs:
         run: git clone --depth 1 https://github.com/nih-at/libzip.git "$env:GITHUB_WORKSPACE/libzip"
         shell: pwsh
       - name: fix libzip escape for cross-compilation (upstream assumes cmd.exe but Linux expels)
-        run: python3 -c "import pathlib; p = pathlib.Path('$env:GITHUB_WORKSPACE/libzip/cmake/GenerateCommandTable.cmake'); s = p.read_text(); s = s.replace('  if(NOT WIN32)
-    string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
-  else()
-    set(SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")
-  endif()', '  string(REPLACE ";" "\\;" SOURCES_ABS_ESCAPED "${SOURCES_ABSOLUTE}")'); p.write_text(s)"
+        run: python3 "$GITHUB_WORKSPACE/scripts/ci-patches/patch-libzip-escape.py" "$GITHUB_WORKSPACE/libzip"
         shell: bash
       - name: build + run libzip via POA
         shell: bash
