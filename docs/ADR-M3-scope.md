@@ -115,3 +115,65 @@ Windows PE produce a working `write(1, "Hello from the M3 spike\n", 23) ; exit(0
   both defer because Remill is the most direct route to an LLVM IR artifact
 - Freestanding sample chosen as the smallest surface for the lifter to demonstrate on
 - Remill build kicked off in parallel; ADR updated after XED build completes
+
+## Spike progress log (Nov 17 2026)
+
+### What worked
+
+- Remill built via its own nix package (`lifting-bits/remill`); LLVM 19.1.7, XED v2025.06.08.
+- The 62-byte `_start` of `hello-freestanding` was lifted with:
+  `remill-lift-19 -arch amd64 -os linux -address 0x10011d0 -entry_address
+  0x10011d0 -bytes <hex> -ir_out /tmp/opencode/m3-build/hello-freq.ll`
+- Output: 324 lines of LLVM IR for that one function (`sub_10011d0`), 14.6 KB.
+- The IR references Remill runtime calls:
+  - `__remill_write_memory_64` / `__remill_read_memory_64` — memory operations
+  - `__remill_sync_hyper_call` — the `syscall` instruction is lifted to a synchronous hypercall boundary
+  - `__remill_async_hyper_call` — external return handling
+  - `__remill_missing_block` — fallback for unknown instruction sequences
+
+That is what Remill emits by design: LLVM IR with an explicit guest→runtime boundary.
+It is **not** a runnable Windows PE.
+
+### What this means for M3's deliverable
+
+Per ADR scope, the v1 target was "produce a Windows x86-64 PE that prints
+'Hello from the M3 spike' under wine, verified by `poa.verify`."
+
+Remill does not produce binary → binary directly. It produces LLVM IR. So the
+honest critical path to the v1 deliverable is:
+
+1. Link the lifted IR with Remill's runtime (which we have via the Nix build)
+   and provide implementations of the `__remill_*` calls for a Windows target.
+2. Re-emit via LLVM's `x86_64-windows-gnu` backend.
+3. Link with the Windows CRT (or provide a stub with no CRT needed for our
+   freestanding sample).
+4. Verify under wine.
+
+### Realistic assessment
+
+This is closer to "the lifter works and emits the right IR" than to "we have
+portable Linux binaries." The remaining work after Remill is:
+
+- Writing Windows-side implementations of the ~7 `__remill_*` routines
+- Bridging to the Windows SYSCALL ABI (WriteFile / GetStdHandle / etc.)
+- Building it all into LLVM and emitting a PE
+
+Each is a small project. Steps 1 and 3 are tractable. Step 2 (the syscall ABI
+bridge) is where the scope creep lives — every Linux syscall number would
+need an equivalent Windows call, and for non-trivial programs that's hundreds
+of cases. For `hello-freestanding` there are only two syscalls (write and
+exit), so a v1 Win32 shim is well within reach.
+
+### What we will not do in v1
+
+- No general-purpose syscall bridge
+- No CPU-state completeness (we don't emulate all flags, vector regs, etc.)
+- No libc-style support; the sample goes direct to syscalls so we don't need any
+
+### Next steps
+
+1. Lift the musl-static hello to confirm the larger surface works (optional —
+   the freestanding sample already proves the lifter runs).
+2. Write a minimal `__remill_runtime_win32_x86_64` in C that provides the
+   `__remill_*` calls for the specific two syscalls (`write`, `exit`).
+3. Compile `hello-freq.ll + runtime` → `.obj`, link as PE, verify with wine.
