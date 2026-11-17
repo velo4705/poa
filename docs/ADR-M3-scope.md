@@ -69,4 +69,49 @@ path or close it negative with numbers.
 
 ## Appendix — attempts log
 
-(populated during work)
+### What the lifter must actually translate
+
+The M3 spike's minimal sample is a 2 KB static ELF with no external
+dependencies. Its entire instruction surface is:
+
+```asm
+_start:
+    push   %rbp
+    mov    %rsp,%rbp
+    movabs $0x1000158,%rax          # message pointer
+    mov    %rax,-0x8(%rbp)
+    movq   $0x17,-0x10(%rbp)        # length
+    mov    -0x8(%rbp),%rsi
+    mov    $0x1,%edi
+    mov    $0x17,%edx               # number of bytes
+    mov    %edi,%eax                # syscall number 1 (write)
+    syscall
+    mov    %rax,-0x10(%rbp)
+    mov    $0x3c,%rax               # syscall number 60 (exit)
+    xor    %rdi,%rdi
+    syscall
+```
+
+Everything the lifter must handle is visible — register setup, immediates,
+syscall encoding. None of this needs a CRT, none of this needs a loader.
+The lifter's job for this sample is bounded by construction: translate
+the 13 instructions at address 0x10011d0–0x100120a and have the resulting
+Windows PE produce a working `write(1, "Hello from the M3 spike\n", 23) ; exit(0)`.
+
+### Build-derived facts about musl-static hello-m3.c
+
+- ~855 KB debug-rich ELF with full musl startup code (crt1.o, crti.o,
+  init sections, stdio setup)
+- Not a realistic recipe for a clean lifter run — millions of instructions
+  including libc internals would need to translate and most won't without a libc shim
+- Pinned to 64-bit x86-64 (the only ISA POA considers in this spike)
+
+### Decision logs
+
+- M3 direction locked: **Linux -> Windows** (one direction only)
+- Lifter candidate: **Remill** (LLVM-based lifter; 1.9k stars, Apache-2.0,
+  actively maintained by lifting-bits; Intel XED based)
+- Fallback candidate: McSema (Remill-based decompiler); Ghidra headless (Java) —
+  both defer because Remill is the most direct route to an LLVM IR artifact
+- Freestanding sample chosen as the smallest surface for the lifter to demonstrate on
+- Remill build kicked off in parallel; ADR updated after XED build completes
