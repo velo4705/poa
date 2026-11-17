@@ -31,6 +31,7 @@ import { scanDependencies } from "./scan.js";
 import { chooseStrategy } from "./strategy.js";
 import { detectBuildSystem } from "./buildsystem.js";
 import { buildPort, verifyPort } from "./build.js";
+import { liftBinary, recompileFromIr } from "./lift.js";
 import {
   getSession,
   saveSession,
@@ -629,6 +630,61 @@ server.registerTool(
     } catch (err) {
       return fail(`poa.verify crashed internally (this is a bug): ${(err as Error).message}`);
     }
+  }),
+);
+
+
+// ----------------------------------------------------------- Lift & recompile (experimental — M3)
+
+server.registerTool(
+  "poa.lift",
+  {
+    title: "Lift a native binary to LLVM IR (experimental)",
+    description:
+      "Static retranslation via Remill: lift a PE / ELF / Mach-O binary to LLVM bitcode for the requested architecture and OS. This is a research spike, not a general translator — the produced IR will need a host-side runtime implementing any OS calls the binary makes. If the lifter fails or the architecture is unsupported, returns a structured blocker. M3 direction.",
+    inputSchema: {
+      input: z.string().describe("Path to the binary to lift"),
+      output: z.string().optional().describe("Where to write the .bc (default: beside the input)"),
+      arch: z.enum(["amd64", "x86_64", "i386", "aarch64", "aarch32"]).optional().describe("Override the detected arch"),
+      os: z.enum(["windows", "linux", "macos", "solaris"]).optional().describe("OS for the lifter's instruction semantics"),
+      range: z.tuple([z.number().int().min(0), z.number().int().min(1)]).optional().describe("Optional [start, end] file offsets to lift a slice"),
+    },
+  },
+  locked("poa.lift", async ({ input, output, arch, os, range }) => {
+    const r = await liftBinary({
+      input,
+      ...(output !== undefined ? { output } : {}),
+      ...(arch !== undefined ? { arch } : {}),
+      ...(os !== undefined ? { os } : {}),
+      ...(range !== undefined ? { range: range as [number, number] } : {}),
+    });
+    await appendLog(rootDir, { tool: "poa.lift", ok: r.ok, irPath: r.irPath ?? null });
+    return json(r);
+  }),
+);
+
+server.registerTool(
+  "poa.recompile",
+  {
+    title: "Compile lifted IR into a target object (experimental)",
+    description:
+      "Compile the lifted LLVM bitcode (.ll / .bc) for a target architecture via zig cc. The result is a .o file. This does NOT produce a runnable binary on its own — you still need a host runtime implementing the OS calls that the lifted code makes. Returns a structured blocker if zig or the target triple is unsupported.",
+    inputSchema: {
+      irPath: z.string().describe("Path to a lifted .ll / .bc producing by poa.lift"),
+      targetArch: z.enum(["x86_64", "aarch64", "arm", "i386", "riscv64"]).describe("Target architecture"),
+      targetOs: z.enum(["linux", "windows", "macos"]).optional().describe("Default: linux"),
+      output: z.string().optional().describe("Output path for the .o (default: ./recompiled/<name>.o)"),
+    },
+  },
+  locked("poa.recompile", async ({ irPath, targetArch, targetOs, output }) => {
+    const r = await recompileFromIr({
+      irPath,
+      targetArch,
+      ...(targetOs !== undefined ? { targetOs } : {}),
+      ...(output !== undefined ? { output } : {}),
+    });
+    await appendLog(rootDir, { tool: "poa.recompile", ok: r.ok, output: r.output ?? null });
+    return json(r);
   }),
 );
 
