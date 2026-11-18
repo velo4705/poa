@@ -32,6 +32,7 @@ import { chooseStrategy } from "./strategy.js";
 import { detectBuildSystem } from "./buildsystem.js";
 import { buildPort, verifyPort } from "./build.js";
 import { liftBinary, recompileFromIr } from "./lift.js";
+import { goBuildInfo, verifyEmbeddedAssets } from "./extract.js";
 import {
   getSession,
   saveSession,
@@ -684,6 +685,44 @@ server.registerTool(
       ...(output !== undefined ? { output } : {}),
     });
     await appendLog(rootDir, { tool: "poa.recompile", ok: r.ok, output: r.output ?? null });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Extraction & verification (M3)
+
+server.registerTool(
+  "poa.go_buildinfo",
+  {
+    title: "Read the Go buildinfo embedded in a Go binary",
+    description:
+      "Runs `go version -m` and parses it into structured JSON: toolchain version, module path/version, the full dependency graph with h1 hashes, and build settings (GOOS/GOARCH/CGO_ENABLED/tags/-trimpath). Works on stripped Go binaries and survives -trimpath. This is build metadata, not decompiled source. Requires the Go toolchain on PATH.",
+    inputSchema: {
+      input: z.string().describe("Path to the Go binary (PE, ELF, Mach-O)"),
+    },
+  },
+  locked("poa.go_buildinfo", async ({ input }) => {
+    const r = await goBuildInfo(input);
+    await appendLog(rootDir, { tool: "poa.go_buildinfo", ok: r.ok, module: r.module ?? null });
+    return json(r);
+  }),
+);
+
+server.registerTool(
+  "poa.verify_embedded_assets",
+  {
+    title: "Prove reference files appear byte-identically inside a binary",
+    description:
+      "Walks a reference directory (e.g. a freshly built frontend/dist) and checks whether each file's bytes appear inside the target binary. Byte-exact match first, CRLF-normalized fallback for Windows-built artifacts. Returns per-file offset/size/sha256 and a summary; writes a JSON report if `output` is given. Does not decompile code — and reports not-found honestly rather than guessing.",
+    inputSchema: {
+      input: z.string().describe("Path to the target binary"),
+      referenceDir: z.string().describe("Path to the reference directory of files to locate inside the binary"),
+      output: z.string().optional().describe("Optional path to write the JSON report (e.g. '.poa/embedded-assets.json')"),
+    },
+  },
+  locked("poa.verify_embedded_assets", async ({ input, referenceDir, output }) => {
+    const r = await verifyEmbeddedAssets({ input, referenceDir, ...(output !== undefined ? { output } : {}) });
+    await appendLog(rootDir, { tool: "poa.verify_embedded_assets", ok: r.ok, found: r.foundByteIdentical + r.foundCrlfNormalized, total: r.total });
     return json(r);
   }),
 );

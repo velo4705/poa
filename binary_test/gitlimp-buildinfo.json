@@ -1,0 +1,114 @@
+{
+  "ok": true,
+  "deps": [
+    {
+      "path": "git.sr.ht/~jackmordaunt/go-toast/v2",
+      "version": "v2.0.3",
+      "hash": "h1:N3IGoHHp9pb6mj1cbXbuaSXV/UMKwmbKLf53nQmtqMA="
+    },
+    {
+      "path": "github.com/bep/debounce",
+      "version": "v1.2.1",
+      "hash": "h1:v67fRdBA9UQu2NhLFXrSg0Brw7CexQekrBwDMM8bzeY="
+    },
+    {
+      "path": "github.com/fsnotify/fsnotify",
+      "version": "v1.9.0",
+      "hash": "h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k="
+    },
+    {
+      "path": "github.com/go-ole/go-ole",
+      "version": "v1.3.0",
+      "hash": "h1:Dt6ye7+vXGIKZ7Xtk4s6/xVdGDQynvom7xCFEdWr6uE="
+    },
+    {
+      "path": "github.com/google/uuid",
+      "version": "v1.6.0",
+      "hash": "h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0="
+    },
+    {
+      "path": "github.com/leaanthony/go-ansi-parser",
+      "version": "v1.6.1",
+      "hash": "h1:xd8bzARK3dErqkPFtoF9F3/HgN8UQk0ed1YDKpEz01A="
+    },
+    {
+      "path": "github.com/leaanthony/slicer",
+      "version": "v1.6.0",
+      "hash": "h1:1RFP5uiPJvT93TAHi+ipd3NACobkW53yUiBqZheE/Js="
+    },
+    {
+      "path": "github.com/leaanthony/u",
+      "version": "v1.1.1",
+      "hash": "h1:TUFjwDGlNX+WuwVEzDqQwC2lOv0P4uhTQw7CMFdiK7M="
+    },
+    {
+      "path": "github.com/pkg/browser",
+      "version": "v0.0.0-20240102092130-5ac0b6a4141c",
+      "hash": "h1:+mdjkGKdHQG3305AYmdv1U2eRNDiU2ErMBj1gwrq8eQ="
+    },
+    {
+      "path": "github.com/pkg/errors",
+      "version": "v0.9.1",
+      "hash": "h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4="
+    },
+    {
+      "path": "github.com/rivo/uniseg",
+      "version": "v0.4.7",
+      "hash": "h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ="
+    },
+    {
+      "path": "github.com/samber/lo",
+      "version": "v1.49.1",
+      "hash": "h1:4BIFyVfuQSEpluc7Fua+j1NolZHiEHEpaSEKdsH0tew="
+    },
+    {
+      "path": "github.com/tkrajina/go-reflector",
+      "version": "v0.5.8",
+      "hash": "h1:yPADHrwmUbMq4RGEyaOUpz2H90sRsETNVpjzo3DLVQQ="
+    },
+    {
+      "path": "github.com/wailsapp/go-webview2",
+      "version": "v1.0.22",
+      "hash": "h1:YT61F5lj+GGaat5OB96Aa3b4QA+mybD0Ggq6NZijQ58="
+    },
+    {
+      "path": "github.com/wailsapp/mimetype",
+      "version": "v1.4.1",
+      "hash": "h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs="
+    },
+    {
+      "path": "github.com/wailsapp/wails/v2",
+      "version": "v2.14.0",
+      "hash": "h1:+GlF6BM8Mg7Saa1lxUAzfZ6jsEMg2zQhQvUHtqB7xpc="
+    },
+    {
+      "path": "golang.org/x/net",
+      "version": "v0.56.0",
+      "hash": "h1:Rw8j/hFzGvJUZwNBXnAtf5sVDVt+65SK2C7IxCxZt5o="
+    },
+    {
+      "path": "golang.org/x/sys",
+      "version": "v0.46.0",
+      "hash": "h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw="
+    },
+    {
+      "path": "golang.org/x/text",
+      "version": "v0.39.0",
+      "hash": "h1:UbZz4pLOvn600D6Oh6GGEI6VAmndrEBLv8/6BEXzyus="
+    }
+  ],
+  "build": {
+    "buildmode": "exe",
+    "compiler": "gc",
+    "tags": "desktop,wv2runtime.download,production",
+    "trimpath": "true",
+    "CGO_ENABLED": "0",
+    "GOARCH": "amd64",
+    "GOOS": "windows",
+    "GOAMD64": "v1"
+  },
+  "raw": "/home/nix/Projects/poa/binary_test/gitlimp.exe: go1.25.12\n\tpath\tgitlimp\n\tmod\tgitlimp\t(devel)\t\n\tdep\tgit.sr.ht/~jackmordaunt/go-toast/v2\tv2.0.3\th1:N3IGoHHp9pb6mj1cbXbuaSXV/UMKwmbKLf53nQmtqMA=\n\tdep\tgithub.com/bep/debounce\tv1.2.1\th1:v67fRdBA9UQu2NhLFXrSg0Brw7CexQekrBwDMM8bzeY=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/go-ole/go-ole\tv1.3.0\th1:Dt6ye7+vXGIKZ7Xtk4s6/xVdGDQynvom7xCFEdWr6uE=\n\tdep\tgithub.com/google/uuid\tv1.6.0\th1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=\n\tdep\tgithub.com/leaanthony/go-ansi-parser\tv1.6.1\th1:xd8bzARK3dErqkPFtoF9F3/HgN8UQk0ed1YDKpEz01A=\n\tdep\tgithub.com/leaanthony/slicer\tv1.6.0\th1:1RFP5uiPJvT93TAHi+ipd3NACobkW53yUiBqZheE/Js=\n\tdep\tgithub.com/leaanthony/u\tv1.1.1\th1:TUFjwDGlNX+WuwVEzDqQwC2lOv0P4uhTQw7CMFdiK7M=\n\tdep\tgithub.com/pkg/browser\tv0.0.0-20240102092130-5ac0b6a4141c\th1:+mdjkGKdHQG3305AYmdv1U2eRNDiU2ErMBj1gwrq8eQ=\n\tdep\tgithub.com/pkg/errors\tv0.9.1\th1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=\n\tdep\tgithub.com/rivo/uniseg\tv0.4.7\th1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=\n\tdep\tgithub.com/samber/lo\tv1.49.1\th1:4BIFyVfuQSEpluc7Fua+j1NolZHiEHEpaSEKdsH0tew=\n\tdep\tgithub.com/tkrajina/go-reflector\tv0.5.8\th1:yPADHrwmUbMq4RGEyaOUpz2H90sRsETNVpjzo3DLVQQ=\n\tdep\tgithub.com/wailsapp/go-webview2\tv1.0.22\th1:YT61F5lj+GGaat5OB96Aa3b4QA+mybD0Ggq6NZijQ58=\n\tdep\tgithub.com/wailsapp/mimetype\tv1.4.1\th1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=\n\tdep\tgithub.com/wailsapp/wails/v2\tv2.14.0\th1:+GlF6BM8Mg7Saa1lxUAzfZ6jsEMg2zQhQvUHtqB7xpc=\n\tdep\tgolang.org/x/net\tv0.56.0\th1:Rw8j/hFzGvJUZwNBXnAtf5sVDVt+65SK2C7IxCxZt5o=\n\tdep\tgolang.org/x/sys\tv0.46.0\th1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw=\n\tdep\tgolang.org/x/text\tv0.39.0\th1:UbZz4pLOvn600D6Oh6GGEI6VAmndrEBLv8/6BEXzyus=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-tags=desktop,wv2runtime.download,production\n\tbuild\t-trimpath=true\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=windows\n\tbuild\tGOAMD64=v1",
+  "goVersion": "go1.25.12",
+  "module": "gitlimp",
+  "moduleVersion": "(devel)"
+}

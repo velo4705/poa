@@ -1,0 +1,888 @@
+{
+  "ok": true,
+  "input": "/home/nix/Projects/poa/binary_test/gitlimp.exe",
+  "inputSha256": "2d47893ca49e0745bb2c11509e9476a14aa46fab29f54713df77be5061343e76",
+  "referenceDir": "/tmp/opencode/gitlimp/frontend/dist",
+  "total": 125,
+  "foundByteIdentical": 124,
+  "foundCrlfNormalized": 0,
+  "foundEolNormalized": 1,
+  "notFound": 0,
+  "bytesMatched": 5772310,
+  "assets": [
+    {
+      "file": "assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
+      "size": 28076,
+      "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308",
+      "match": "exact",
+      "offset": 7081888
+    },
+    {
+      "file": "assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
+      "size": 33516,
+      "sha256": "30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251",
+      "match": "exact",
+      "offset": 7388416
+    },
+    {
+      "file": "assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
+      "size": 63632,
+      "sha256": "68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13",
+      "match": "exact",
+      "offset": 7826432
+    },
+    {
+      "file": "assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
+      "size": 12368,
+      "sha256": "07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268",
+      "match": "exact",
+      "offset": 6424512
+    },
+    {
+      "file": "assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
+      "size": 7716,
+      "sha256": "1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed",
+      "match": "exact",
+      "offset": 6232352
+    },
+    {
+      "file": "assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
+      "size": 6912,
+      "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c",
+      "match": "exact",
+      "offset": 6195520
+    },
+    {
+      "file": "assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
+      "size": 7656,
+      "sha256": "3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c",
+      "match": "exact",
+      "offset": 6224672
+    },
+    {
+      "file": "assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
+      "size": 6908,
+      "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b",
+      "match": "exact",
+      "offset": 6188608
+    },
+    {
+      "file": "assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
+      "size": 12344,
+      "sha256": "ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7",
+      "match": "exact",
+      "offset": 6412160
+    },
+    {
+      "file": "assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
+      "size": 19584,
+      "sha256": "9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1",
+      "match": "exact",
+      "offset": 6749920
+    },
+    {
+      "file": "assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
+      "size": 13296,
+      "sha256": "9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb",
+      "match": "exact",
+      "offset": 6450112
+    },
+    {
+      "file": "assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
+      "size": 11348,
+      "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f",
+      "match": "exact",
+      "offset": 6340448
+    },
+    {
+      "file": "assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
+      "size": 19572,
+      "sha256": "1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3",
+      "match": "exact",
+      "offset": 6730336
+    },
+    {
+      "file": "assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
+      "size": 11316,
+      "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc",
+      "match": "exact",
+      "offset": 6329120
+    },
+    {
+      "file": "assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
+      "size": 13208,
+      "sha256": "5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463",
+      "match": "exact",
+      "offset": 6436896
+    },
+    {
+      "file": "assets/KaTeX_Main-Bold-Cx986IdX.woff2",
+      "size": 25324,
+      "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021",
+      "match": "exact",
+      "offset": 6950144
+    },
+    {
+      "file": "assets/KaTeX_Main-Bold-Jm3AIy58.woff",
+      "size": 29912,
+      "sha256": "c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822",
+      "match": "exact",
+      "offset": 7139392
+    },
+    {
+      "file": "assets/KaTeX_Main-Bold-waoOVXN0.ttf",
+      "size": 51336,
+      "sha256": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8",
+      "match": "exact",
+      "offset": 7660736
+    },
+    {
+      "file": "assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
+      "size": 16780,
+      "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b",
+      "match": "exact",
+      "offset": 6602784
+    },
+    {
+      "file": "assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
+      "size": 32968,
+      "sha256": "70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f",
+      "match": "exact",
+      "offset": 7355424
+    },
+    {
+      "file": "assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
+      "size": 19412,
+      "sha256": "a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c",
+      "match": "exact",
+      "offset": 6691456
+    },
+    {
+      "file": "assets/KaTeX_Main-Italic-3WenGoN9.ttf",
+      "size": 33580,
+      "sha256": "0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a",
+      "match": "exact",
+      "offset": 7421952
+    },
+    {
+      "file": "assets/KaTeX_Main-Italic-BMLOBm91.woff",
+      "size": 19676,
+      "sha256": "f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf",
+      "match": "exact",
+      "offset": 6769504
+    },
+    {
+      "file": "assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
+      "size": 16988,
+      "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267",
+      "match": "exact",
+      "offset": 6619584
+    },
+    {
+      "file": "assets/KaTeX_Main-Regular-B22Nviop.woff2",
+      "size": 26272,
+      "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866",
+      "match": "exact",
+      "offset": 7000960
+    },
+    {
+      "file": "assets/KaTeX_Main-Regular-Dr94JaBh.woff",
+      "size": 30772,
+      "sha256": "c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc",
+      "match": "exact",
+      "offset": 7169312
+    },
+    {
+      "file": "assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
+      "size": 53580,
+      "sha256": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830",
+      "match": "exact",
+      "offset": 7712096
+    },
+    {
+      "file": "assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
+      "size": 31196,
+      "sha256": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5",
+      "match": "exact",
+      "offset": 7292896
+    },
+    {
+      "file": "assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
+      "size": 16400,
+      "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1",
+      "match": "exact",
+      "offset": 6553248
+    },
+    {
+      "file": "assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
+      "size": 18668,
+      "sha256": "850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e",
+      "match": "exact",
+      "offset": 6654016
+    },
+    {
+      "file": "assets/KaTeX_Math-Italic-DA0__PXp.woff",
+      "size": 18748,
+      "sha256": "8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571",
+      "match": "exact",
+      "offset": 6672704
+    },
+    {
+      "file": "assets/KaTeX_Math-Italic-flOr_0UB.ttf",
+      "size": 31308,
+      "sha256": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a",
+      "match": "exact",
+      "offset": 7324096
+    },
+    {
+      "file": "assets/KaTeX_Math-Italic-t53AETM-.woff2",
+      "size": 16440,
+      "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264",
+      "match": "exact",
+      "offset": 6569664
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
+      "size": 24504,
+      "sha256": "1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0",
+      "match": "exact",
+      "offset": 6925632
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
+      "size": 12216,
+      "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62",
+      "match": "exact",
+      "offset": 6375360
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
+      "size": 14408,
+      "sha256": "ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba",
+      "match": "exact",
+      "offset": 6491104
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
+      "size": 12028,
+      "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a",
+      "match": "exact",
+      "offset": 6363328
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
+      "size": 14112,
+      "sha256": "91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2",
+      "match": "exact",
+      "offset": 6476992
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
+      "size": 22364,
+      "sha256": "3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083",
+      "match": "exact",
+      "offset": 6809440
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
+      "size": 19436,
+      "sha256": "f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad",
+      "match": "exact",
+      "offset": 6710880
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
+      "size": 12316,
+      "sha256": "11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605",
+      "match": "exact",
+      "offset": 6399840
+    },
+    {
+      "file": "assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
+      "size": 10344,
+      "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342",
+      "match": "exact",
+      "offset": 6276704
+    },
+    {
+      "file": "assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
+      "size": 16648,
+      "sha256": "1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67",
+      "match": "exact",
+      "offset": 6586112
+    },
+    {
+      "file": "assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
+      "size": 9644,
+      "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b",
+      "match": "exact",
+      "offset": 6256960
+    },
+    {
+      "file": "assets/KaTeX_Script-Regular-D5yQViql.woff",
+      "size": 10588,
+      "sha256": "d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a",
+      "match": "exact",
+      "offset": 6307840
+    },
+    {
+      "file": "assets/KaTeX_Size1-Regular-C195tn64.woff",
+      "size": 6496,
+      "sha256": "c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9",
+      "match": "exact",
+      "offset": 6175392
+    },
+    {
+      "file": "assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
+      "size": 12228,
+      "sha256": "95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b",
+      "match": "exact",
+      "offset": 6387584
+    },
+    {
+      "file": "assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
+      "size": 5468,
+      "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe",
+      "match": "exact",
+      "offset": 6139744
+    },
+    {
+      "file": "assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
+      "size": 11508,
+      "sha256": "a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b",
+      "match": "exact",
+      "offset": 6351808
+    },
+    {
+      "file": "assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
+      "size": 5208,
+      "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd",
+      "match": "exact",
+      "offset": 6129184
+    },
+    {
+      "file": "assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
+      "size": 6188,
+      "sha256": "2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d",
+      "match": "exact",
+      "offset": 6162912
+    },
+    {
+      "file": "assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
+      "size": 4420,
+      "sha256": "6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949",
+      "match": "exact",
+      "offset": 6105120
+    },
+    {
+      "file": "assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
+      "size": 7588,
+      "sha256": "500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082",
+      "match": "exact",
+      "offset": 6217056
+    },
+    {
+      "file": "assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
+      "size": 5980,
+      "sha256": "99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58",
+      "match": "exact",
+      "offset": 6150880
+    },
+    {
+      "file": "assets/KaTeX_Size4-Regular-DWFBv043.ttf",
+      "size": 10364,
+      "sha256": "c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877",
+      "match": "exact",
+      "offset": 6287072
+    },
+    {
+      "file": "assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
+      "size": 4928,
+      "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0",
+      "match": "exact",
+      "offset": 6119168
+    },
+    {
+      "file": "assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
+      "size": 16028,
+      "sha256": "e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7",
+      "match": "exact",
+      "offset": 6537216
+    },
+    {
+      "file": "assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
+      "size": 13568,
+      "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b",
+      "match": "exact",
+      "offset": 6463424
+    },
+    {
+      "file": "assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf",
+      "size": 27556,
+      "sha256": "f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa",
+      "match": "exact",
+      "offset": 7054304
+    },
+    {
+      "file": "assets/abnfDiagram-N423BO3Z-brpXfPGB.js",
+      "size": 1774,
+      "sha256": "9d4a4b69a76eab3c50096732ab1e60e1f2e9f6803c8d4e52e4d5d9733ccf8179",
+      "match": "exact",
+      "offset": 6083008
+    },
+    {
+      "file": "assets/arc-Bh5Gbf6B.js",
+      "size": 3432,
+      "sha256": "2c3854bb9e712f01712d4a62f95cc1da7066140c926b5232520f1cd894ff214e",
+      "match": "exact",
+      "offset": 6097472
+    },
+    {
+      "file": "assets/architectureDiagram-T3A2C74G-ZK1PlspO.js",
+      "size": 151788,
+      "sha256": "3160578f3a1dd7fc8c64941afac9926df84bc2968310a30304f15545ad147b86",
+      "match": "exact",
+      "offset": 8492192
+    },
+    {
+      "file": "assets/blockDiagram-VBNYF7ZC-Vvu7wQfu.js",
+      "size": 73701,
+      "sha256": "63a0a78d685036911d3dff901d2851fb3cf91ec0844b8e8972004287ecf73c1f",
+      "match": "exact",
+      "offset": 8101120
+    },
+    {
+      "file": "assets/c4Diagram-5PPSVZJV-BNrznjFK.js",
+      "size": 69909,
+      "sha256": "030861847b6bf5642454b425efbed0ae3b46dca59bb57ecd5b320836e1649ee0",
+      "match": "exact",
+      "offset": 7959744
+    },
+    {
+      "file": "assets/channel-DZFUL9Zo.js",
+      "size": 108,
+      "sha256": "acd52f04e09262fbf31406a743b09fe357fe37dc720490eab8aa7dc9e6fe8496",
+      "match": "exact",
+      "offset": 6065152
+    },
+    {
+      "file": "assets/chunk-2GRJ4B5K-BPe65QgK.js",
+      "size": 1876,
+      "sha256": "d991b074c49a823fadc28a4808d31f417ce5f3b3b0c06baba7b35380cc320a62",
+      "match": "exact",
+      "offset": 6086624
+    },
+    {
+      "file": "assets/chunk-2Q5K7J3B-f1Eiz5mP.js",
+      "size": 186,
+      "sha256": "b135df60d94d173afe14250dcbf2851779f863b4905f599de6f47bd003b912c4",
+      "match": "exact",
+      "offset": 6068746
+    },
+    {
+      "file": "assets/chunk-5RXB4S5H-DHzaNM3X.js",
+      "size": 38113,
+      "sha256": "4d863b3ddbe46903e653df3184e56d0e766cd238eefa8bb0fd0d7f1486c87ff8",
+      "match": "exact",
+      "offset": 7489536
+    },
+    {
+      "file": "assets/chunk-5VM5RSS4-Clg-pOWL.js",
+      "size": 359,
+      "sha256": "bfc811fe4dd1646013dd9ad83af21d53eb9e79c42047491986f522d6fb41db31",
+      "match": "exact",
+      "offset": 6070492
+    },
+    {
+      "file": "assets/chunk-6Q2QTUOP-v9eB4ICC.js",
+      "size": 15728,
+      "sha256": "1c1eae9db64519b82a91679308bcfcf78bc320b8ca7b841698e5936ff85ab3fe",
+      "match": "exact",
+      "offset": 6505536
+    },
+    {
+      "file": "assets/chunk-GF5L2VYU-BCkSww-v.js",
+      "size": 49171,
+      "sha256": "e4cfc02af252b5e83a01a0351c3398b8699e4450ed705db3c29e4d44be1ae4cc",
+      "match": "exact",
+      "offset": 7611552
+    },
+    {
+      "file": "assets/chunk-JWPE2WC7-1IhkAHEK.js",
+      "size": 220,
+      "sha256": "a441c75a0bb05d66fa2a9ede0f10a557b55c8bf3d8ed0076474312edd634216a",
+      "match": "exact",
+      "offset": 6069532
+    },
+    {
+      "file": "assets/chunk-KBJHAD2P-CHt8HTRM.js",
+      "size": 499,
+      "sha256": "90af03799c852a24a67ee1acb8033983402b07e2fa66e17a35077052045ec453",
+      "match": "exact",
+      "offset": 6072047
+    },
+    {
+      "file": "assets/chunk-RYQCIY6F-DzbWMDj5.js",
+      "size": 7074,
+      "sha256": "65fd6b79bc76f5313df33c20a0312c9d9d6c997b314d32b7a79df92bef02292b",
+      "match": "exact",
+      "offset": 6202432
+    },
+    {
+      "file": "assets/chunk-XXDRQBXY-BAdF3Zfg.js",
+      "size": 228,
+      "sha256": "c663e237466eb8fd407e047af90cbd309f1c079d89b061c1ae385d7eff53236a",
+      "match": "exact",
+      "offset": 6069752
+    },
+    {
+      "file": "assets/classDiagram-JCYQIIEL-DJ6RMSd4.js",
+      "size": 432,
+      "sha256": "56baa58ffc13589c452df8b507c5f99e286d758d006c1176b6720281ceed46ef",
+      "match": "exact",
+      "offset": 6071615
+    },
+    {
+      "file": "assets/classDiagram-v2-OCEON4UE-DJ6RMSd4.js",
+      "size": 432,
+      "sha256": "56baa58ffc13589c452df8b507c5f99e286d758d006c1176b6720281ceed46ef",
+      "match": "exact",
+      "offset": 6071615
+    },
+    {
+      "file": "assets/cose-bilkent-JH36ORCC-BWirJ58v.js",
+      "size": 81662,
+      "sha256": "c9f38b46be16e777871a2b043f8f40276eedfb901170dd4387edd2c6bdca5cda",
+      "match": "exact",
+      "offset": 8174848
+    },
+    {
+      "file": "assets/cynefin-VYW2F7L2-DD8-bDF7.js",
+      "size": 687889,
+      "sha256": "1fab2ba8f89f91758152c535c2e1d3742d16a7741e628016f9f844603cb157fc",
+      "match": "exact",
+      "offset": 9681792
+    },
+    {
+      "file": "assets/cynefinDiagram-MW4NZA55-C-TsMGEr.js",
+      "size": 10062,
+      "sha256": "184646c9d6f68f43b28ad513198bdb8438281f75d766682ee01e481677767a2e",
+      "match": "exact",
+      "offset": 6266624
+    },
+    {
+      "file": "assets/cytoscape.esm-yzknjiTM.js",
+      "size": 443036,
+      "sha256": "bee16016bbc662489dee40008c6ec30b259b3a619de2a9ce18b2f18621913e9b",
+      "match": "exact",
+      "offset": 9238752
+    },
+    {
+      "file": "assets/dagre-VZM6K2ZE-BMaSxkqm.js",
+      "size": 8532,
+      "sha256": "e873c51ed9bbf01e7d3213c3c64941c3048336a9df5dde0da2b4d115ec132dc2",
+      "match": "exact",
+      "offset": 6248416
+    },
+    {
+      "file": "assets/defaultLocale-DX6XiGOO.js",
+      "size": 4688,
+      "sha256": "0cefbd76f932c4eea4758d28169802589b1ad15b46607253de4bd82328998ece",
+      "match": "exact",
+      "offset": 6109568
+    },
+    {
+      "file": "assets/diagram-7IWD3JNH-xwHuKywH.js",
+      "size": 8294,
+      "sha256": "4a6fd778196e78d2d2c761c3eaba499f243956642087f2e80b20b1783590c21c",
+      "match": "exact",
+      "offset": 6240096
+    },
+    {
+      "file": "assets/diagram-B4RE2ZJO-8aw-I69K.js",
+      "size": 10681,
+      "sha256": "c191e3bd87777f2ea8773cc1fec3144da3ff50655db1e5025431421d080edc4c",
+      "match": "exact",
+      "offset": 6318432
+    },
+    {
+      "file": "assets/diagram-LBJQPF4R-DYrqazsQ.js",
+      "size": 4176,
+      "sha256": "3a3d9ebf27265e90b23d5d7a1a080150c77b0b0aaf873ea8507ffedef695f750",
+      "match": "exact",
+      "offset": 6100928
+    },
+    {
+      "file": "assets/diagram-Q27KOJAE-C5OfucAN.js",
+      "size": 15922,
+      "sha256": "101865cd33f69806c922f30c62af8aa4ce293726289567e7e3b1c7c77c417abc",
+      "match": "exact",
+      "offset": 6521280
+    },
+    {
+      "file": "assets/diagram-UB23O5K3-Bhkak-kD.js",
+      "size": 6044,
+      "sha256": "fa17a6d7aaceab4082c38d14f28894bb91c6d1f80298008d3572615be413c785",
+      "match": "exact",
+      "offset": 6156864
+    },
+    {
+      "file": "assets/ebnfDiagram-BXEA7PRR-BtDZLcgH.js",
+      "size": 1970,
+      "sha256": "0b3b365233681c80c6b4dcdc35c122345107285f32ea96edfaa5ed707d11aad0",
+      "match": "exact",
+      "offset": 6090464
+    },
+    {
+      "file": "assets/erDiagram-JOGREHBK-B7qcTuVW.js",
+      "size": 27064,
+      "sha256": "d14ee0f09e53b6953e82d55100159cd9ace162c2d90080c87410753eb69cd46a",
+      "match": "exact",
+      "offset": 7027232
+    },
+    {
+      "file": "assets/flowDiagram-UKHOOZJN-BA-C5CCx.js",
+      "size": 60709,
+      "sha256": "1ca0f121b20909d2518cad6c654d8c77a2b38ee0607be9fc1210b75d29387ec6",
+      "match": "exact",
+      "offset": 7765696
+    },
+    {
+      "file": "assets/ganttDiagram-PKOTCBZU-CgZmiwH6.js",
+      "size": 69656,
+      "sha256": "5605596e0485c4b7ac5a339a9d7670dbd5d4f19145f865f4d2318559f7a2b9fe",
+      "match": "exact",
+      "offset": 7890080
+    },
+    {
+      "file": "assets/gitGraphDiagram-DS77QQ5N-XE2DIiQE.js",
+      "size": 29382,
+      "sha256": "ab7edcaf84e399b2501955b3e28e4e5330be6d7f4ec238697644468f37e8e3e2",
+      "match": "exact",
+      "offset": 7109984
+    },
+    {
+      "file": "assets/graph-DOmOIIwC.js",
+      "size": 23924,
+      "sha256": "97862517e3f2f5d40c14fb4b720dc42fd3219a1ab5abd1c560b0ebb06c82c4a2",
+      "match": "exact",
+      "offset": 6901696
+    },
+    {
+      "file": "assets/index-BWFioNr4.js",
+      "size": 1508198,
+      "sha256": "4e76e23cc5628ff5bad7d4c1283e884a2fc01d02f1632a1f29e375d4df100d30",
+      "match": "exact",
+      "offset": 10369696
+    },
+    {
+      "file": "assets/index-D6Cx65yj.css",
+      "size": 71448,
+      "sha256": "758425522768437c1cb04e5d7299aef5026b48c0a0feaba442003bf38e9236e1",
+      "match": "exact",
+      "offset": 8029664
+    },
+    {
+      "file": "assets/infoDiagram-6WML65LV-xOv6MBYI.js",
+      "size": 552,
+      "sha256": "6aeec501152cabd35c0900005ca1846398cae831d8c861cef6284d858fdc2a21",
+      "match": "exact",
+      "offset": 6073059
+    },
+    {
+      "file": "assets/init-Gi6I4Gst.js",
+      "size": 147,
+      "sha256": "379fa880c14ad48f43b0c23ff56b30b2b808e8460fd9f9cad8bf7cb278c5b814",
+      "match": "exact",
+      "offset": 6067818
+    },
+    {
+      "file": "assets/ishikawaDiagram-WSZJBQD7-B0AKJxHb.js",
+      "size": 17434,
+      "sha256": "bb6508bd1b3cbd0c7bf4f5f1619a9b111c6bd46cea44375d298b8bcf95c66769",
+      "match": "exact",
+      "offset": 6636576
+    },
+    {
+      "file": "assets/journeyDiagram-NVQOT4AX-Dne4g-j8.js",
+      "size": 23535,
+      "sha256": "a41d01a0a7c03936c3ac13953c23f838436aa1dad7e535dafbb722a54bd6418e",
+      "match": "exact",
+      "offset": 6878144
+    },
+    {
+      "file": "assets/kanban-definition-27J2QSJJ-DU5MLhJR.js",
+      "size": 20256,
+      "sha256": "a2e9bdbc685293301f49c5d7a1986638efbc3211c8d63d4d5091f32f41f3c343",
+      "match": "exact",
+      "offset": 6789184
+    },
+    {
+      "file": "assets/katex-HP8lGamR.js",
+      "size": 261313,
+      "sha256": "0b89c21cb463fd8180e300cb79a3e9e538accb78df5bdec67f0cbba4bdb7949e",
+      "match": "exact",
+      "offset": 8644000
+    },
+    {
+      "file": "assets/layout-D-LzfAck.js",
+      "size": 30997,
+      "sha256": "b598229dc48b69077ee6c3c2092783ebb4fee75cb8fe6a2e76167eccd874aa98",
+      "match": "exact",
+      "offset": 7261888
+    },
+    {
+      "file": "assets/linear-CGGdmdTE.js",
+      "size": 5654,
+      "sha256": "f87225255126cb382a6021e904fdae8c7d5c65c454e0cbbcd3720913b61d0b2f",
+      "match": "exact",
+      "offset": 6145216
+    },
+    {
+      "file": "assets/map-DxJ2ADlA.js",
+      "size": 5070,
+      "sha256": "caf684b7a25676e3f43a63d91ea1ca8016cadb1ffa8aa59336f0bd692b9d130c",
+      "match": "exact",
+      "offset": 6124096
+    },
+    {
+      "file": "assets/mindmap-definition-FAOFIHXS-DDhZ6p5K.js",
+      "size": 23140,
+      "sha256": "6825d68aaa8d2fc8163aef2066477e34a21ca53bdb52eb1d1fd56ab109aedfbe",
+      "match": "exact",
+      "offset": 6831808
+    },
+    {
+      "file": "assets/ordinal-Cboi1Yqb.js",
+      "size": 1189,
+      "sha256": "71be569ce2355b7f256a834b3a4c11668fe80a880b3587c1b3b14e9e5dedf478",
+      "match": "exact",
+      "offset": 6077440
+    },
+    {
+      "file": "assets/pegDiagram-VL7TDLO6-BhqaCJcB.js",
+      "size": 1921,
+      "sha256": "99fc2aa36bcd75e954da926228dbc3beaf90f4b0b947e496595bb863fd7f5858",
+      "match": "exact",
+      "offset": 6088512
+    },
+    {
+      "file": "assets/pieDiagram-7S7Q4E2Y-ipcNSvTK.js",
+      "size": 6259,
+      "sha256": "411bb83251909479111afdead77dbf41474c4ee1484589b31af236958db38722",
+      "match": "exact",
+      "offset": 6169120
+    },
+    {
+      "file": "assets/quadrantDiagram-CIZ2JOQS-D23EoYCE.js",
+      "size": 33975,
+      "sha256": "25fb980b4d9821f224eb05ef0bf6891d6ece06866aa6db9cec3988cc424f052b",
+      "match": "exact",
+      "offset": 7455552
+    },
+    {
+      "file": "assets/railroadDiagram-AXF67PYL-Bg5kQ6TC.js",
+      "size": 1571,
+      "sha256": "fbed2879eca2935b2e849042ad2cb8dc6fb80df61514ef86bd9f34aefc91b182",
+      "match": "exact",
+      "offset": 6081408
+    },
+    {
+      "file": "assets/requirementDiagram-LRYGKXZP-BalEnr3d.js",
+      "size": 30967,
+      "sha256": "fff22c66d5c319ad812f240216aba9535eb1af2345f29c0c09866193ed8c7ae0",
+      "match": "exact",
+      "offset": 7230912
+    },
+    {
+      "file": "assets/sankeyDiagram-W5VNT64P-Bgyl1l-S.js",
+      "size": 23163,
+      "sha256": "d501169f9ea6755d243d648330686c7de38aebd83903b7dda2d1107f7cc98e5d",
+      "match": "exact",
+      "offset": 6854976
+    },
+    {
+      "file": "assets/sequenceDiagram-SI44F4Z6-B3EbqL4M.js",
+      "size": 116927,
+      "sha256": "deae816761368c81730cc0e7ebb1bfb460ca7f1aa3de2d96207a4184735bdd0f",
+      "match": "exact",
+      "offset": 8256512
+    },
+    {
+      "file": "assets/sizeCapture-X5ZJPWSS-D98Qt09-.js",
+      "size": 901,
+      "sha256": "11d5740c3aba125ddf88a6703f2f3b24c047b7741c88971ea1d5218623cba021",
+      "match": "exact",
+      "offset": 6074281
+    },
+    {
+      "file": "assets/stateDiagram-OKZ733FA-EOxIzCk8.js",
+      "size": 10385,
+      "sha256": "95b8c9a2b5f1df5290b190225f4b8c69304eff7812cda7e8577764a93b7849ce",
+      "match": "exact",
+      "offset": 6297440
+    },
+    {
+      "file": "assets/stateDiagram-v2-UEYNNEHI-D1u7svgh.js",
+      "size": 393,
+      "sha256": "a69d12823ad1e90543c6470fc8fca72750494dcb6a2f595d713645e0c012870c",
+      "match": "exact",
+      "offset": 6071222
+    },
+    {
+      "file": "assets/swimlanes-SLNWSIFB-CqTcmd1t.js",
+      "size": 118743,
+      "sha256": "51427e8ef2946bff607112d4719bc75e764c6f16143aca16b563eb87cdc3df53",
+      "match": "exact",
+      "offset": 8373440
+    },
+    {
+      "file": "assets/swimlanesDiagram-ULZ7WXOC-3QDL9Apj.js",
+      "size": 513,
+      "sha256": "18031b30c4fe6d0747db6edf8381f37e0b797e55115a3f474c3206722832dd3f",
+      "match": "exact",
+      "offset": 6072546
+    },
+    {
+      "file": "assets/timeline-definition-Z64GVDOM-j12Im6R5.js",
+      "size": 30794,
+      "sha256": "91625d9c0b2907e1795f516cd12cfd36366872989b1c9adabc2fff4b811765e7",
+      "match": "exact",
+      "offset": 7200096
+    },
+    {
+      "file": "assets/vennDiagram-T6HMQDX7-BorPVYnD.js",
+      "size": 41926,
+      "sha256": "9c03d9316965fa5d1d1f2ba5523a8cb6a465ed449da9af586ce1d5709a42a80e",
+      "match": "exact",
+      "offset": 7569600
+    },
+    {
+      "file": "assets/wardleyDiagram-T6FBY63Y-DI8sx-zO.js",
+      "size": 25467,
+      "sha256": "872bca8e9e2edc96b2a77405938b3c6696a6036f4d8d0f23ef1b459d2b6b3464",
+      "match": "exact",
+      "offset": 6975488
+    },
+    {
+      "file": "assets/xychartDiagram-ELKLHX3M-kyIL97c6.js",
+      "size": 41908,
+      "sha256": "2beddebd8689c5d6403eb3779fb9062c450cef1a8c62c11767da4407ee710650",
+      "match": "exact",
+      "offset": 7527680
+    },
+    {
+      "file": "index.html",
+      "size": 2496,
+      "sha256": "860ec836413110152723fecff733af173320264888b1b1683ad5b532aba31cd5",
+      "match": "eol-normalized"
+    },
+    {
+      "file": "logo.png",
+      "size": 333399,
+      "sha256": "9abffea6817007a3d13d2126de51db32a214bee07227c8f8bcf72e0122c0a95a",
+      "match": "exact",
+      "offset": 8905344
+    }
+  ]
+}
