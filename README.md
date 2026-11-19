@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![M8ven Score](https://m8ven.ai/badge/mcp/velo4705-poa-1bse7p?v=2fbf8391facacbc46a2a3df998889971)](https://m8ven.ai/mcp/velo4705-poa-1bse7p?s=readme)
+[![M8ven Score](https://m8ven.ai/badge/mcp/velo4705-poa-1bse7p?v=fbff28b3ebebfc69508fe7fce657bb31)](https://m8ven.ai/mcp/velo4705-poa-1bse7p?s=readme)
 
 </div>
 
