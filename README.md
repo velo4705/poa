@@ -1,5 +1,11 @@
 # POA — Port Anything
 
+<div align="center">
+
+[![M8ven Score](https://m8ven.ai/badge/mcp/velo4705-poa-1bse7p?v=2fbf8391facacbc46a2a3df998889971)](https://m8ven.ai/mcp/velo4705-poa-1bse7p?s=readme)
+
+</div>
+
 **POA ports software between platforms.** You give it a program — your own
 code, an open-source project, a Windows `.exe` — and it produces a build for
 whatever target you ask for: Linux from Windows, ARM64 from x86-64, and so on.
