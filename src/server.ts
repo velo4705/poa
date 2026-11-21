@@ -33,6 +33,7 @@ import { detectBuildSystem } from "./buildsystem.js";
 import { buildPort, verifyPort } from "./build.js";
 import { liftBinary, recompileFromIr } from "./lift.js";
 import { goBuildInfo, verifyEmbeddedAssets } from "./extract.js";
+import { assessPortability } from "./assess.js";
 import {
   getSession,
   saveSession,
@@ -723,6 +724,31 @@ server.registerTool(
   locked("poa.verify_embedded_assets", async ({ input, referenceDir, output }) => {
     const r = await verifyEmbeddedAssets({ input, referenceDir, ...(output !== undefined ? { output } : {}) });
     await appendLog(rootDir, { tool: "poa.verify_embedded_assets", ok: r.ok, found: r.foundByteIdentical + r.foundCrlfNormalized, total: r.total });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Honesty ladder (README promise)
+
+server.registerTool(
+  "poa.assess_portability",
+  {
+    title: "Assess a binary's portability from possible to impossible",
+    description:
+      "Enforces the README promise: 'Lift a binary to a different platform by magic — POA refuses to pretend.' Walks a binary through an ordered ladder (same-platform → source-derived → IR/object → freestanding → OS ABI → runtime coupling), reporting at each rung what POA can honestly build with measured evidence (imports, Go buildinfo, runtime markers, lifter availability). Returns a machine-readable refusal of magic lifts, the rung where feasibility stops, and the recommended honest tool chain. Use before attempting any binary port.",
+    inputSchema: {
+      input: z.string().describe("Path to the binary to assess"),
+      targetOs: z.string().optional().describe("Target OS id (default: linux)"),
+      targetArch: z.string().optional().describe("Target architecture (default: x86_64)"),
+    },
+  },
+  locked("poa.assess_portability", async ({ input, targetOs, targetArch }) => {
+    const r = await assessPortability({
+      input,
+      ...(targetOs !== undefined ? { targetOs } : {}),
+      ...(targetArch !== undefined ? { targetArch } : {}),
+    });
+    await appendLog(rootDir, { tool: "poa.assess_portability", ok: r.ok, stopAtRung: r.verdict.stopAtRung, magicLift: r.verdict.magicLift });
     return json(r);
   }),
 );

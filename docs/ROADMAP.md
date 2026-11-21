@@ -130,7 +130,7 @@ e.g. coreutils-class utilities, vim/neovim, sqlite tools)
 **Committed tier:** `DEGRADED(perf, rare-instructions)` permitted, must be quantified
 **Gate:** ADR merged with measured numbers; ≥ 3 of 5 binaries byte-verified for behavior
 **GitLiMP evidence (2026-11-18):** `binary_test/RECOVERY.md` — embedded Wails frontend dist located byte-identically inside `gitlimp.exe` (124/124 byte-exact, 1 EOL-normalized); Go backend has no textual source inside the binary — ported via the MIT upstream backend + WebKitGTK tag; `gitlimp-linux-x86_64` verified to launch. New tools: `poa.go_buildinfo`, `poa.verify_embedded_assets`.
-**Decision (ADR):** `docs/ADR-M3-binary-frontier.md` — binary→binary rejected as a product claim; source-based Epson port accepted as a gated workstream, intake contract in `docs/PORT-EPSON-source.md`.
+**Decision (ADR):** `docs/ADR-M3-binary-frontier.md` — binary→binary rejected as a product claim; source-based Epson port accepted as a gated workstream, intake contract in `docs/PORT-EPSON-source.md`. `poa.assess_portability` enforces the refusal mechanically; ladder documented in `docs/PORTABILITY.md`.
 
 ## M4 — WebAssembly: One Artifact, Every Target (Aug – Oct 2027)
 

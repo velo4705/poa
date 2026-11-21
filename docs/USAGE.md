@@ -21,6 +21,14 @@ Launch-time project root, in order of precedence:
 2. `POA_PROJECT_ROOT=/path/to/project`
 3. whatever directory the client launched the server from (usually the open project)
 
+## Binary inputs: the honesty ladder
+
+Before attempting to port a binary, call `poa.assess_portability` (see
+[PORTABILITY.md](PORTABILITY.md)). It walks the input from possible to impossible —
+same-platform → pinned source → IR/object → freestanding → OS ABI → runtime coupling —
+and returns a machine-readable refusal of "magic lifts" with the exact rung where the
+road stops. Drive it from the CLI with `node scripts/assess.mjs <binary>`.
+
 ## A new session, step by step
 
 ```text

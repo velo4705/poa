@@ -22,7 +22,7 @@ target allows, with every loss explicit and documented — never hidden.
 - ✅ Cross-compile from Linux to Windows via a clean toolchain (`zig cc`)
 - ✅ Verify a port runs, using the target's own tests or a native/qemu smoke run
 - ✅ Report exactly what didn't make it, so humans decide what to chase
-- ❌ Lift a binary to a different platform by magic — POA refuses to pretend
+- ❌ Lift a binary to a different platform by magic — POA refuses to pretend; `poa.assess_portability` shows exactly where the possible→impossible ladder stops
 - ❌ Bypass DRM, anti-cheat, or platform licensing — it's out of scope, firmly
 
 ## Who this is for

@@ -70,6 +70,7 @@ await call("poa.start_port", { source: poaRepo, target: "linux-aarch64-generic",
 await call("poa.detect_buildsystem", {});
 await call("poa.plan_port", { source: poaRepo, target: "linux-aarch64-generic" }, { truncate: true });
 await call("poa.scan_dependencies", { path: inspectPath });
+await call("poa.assess_portability", { input: inspectPath, targetOs: "linux", targetArch: "x86_64" }, { truncate: false });
 await call("poa.choose_strategy", { source: poaRepo, target: "linux-aarch64-generic" });
 await call("poa.build", {});          // no $DISPLAY/aarch64 gcc expected — must fail gracefully
 await call("poa.verify", { timeoutMs: 1000 }); // no artifact built — must fail gracefully
