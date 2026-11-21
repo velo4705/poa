@@ -138,12 +138,13 @@ if (rung === 1) {
     await call("poa.lift", { input, output: bc, arch: "amd64", os: assessment.evidence?.sourceOs === "windows" ? "windows" : "linux" }));
   report.details = { lift };
   if (lift.ok) report.artifacts.push({ path: bc, kind: "llvm-bitcode", verified: false });
-  const rec = await trace("poa.recompile", { irPath: bc, targetArch, targetOs, output: obj },
-    await call("poa.recompile", { irPath: bc, targetArch, targetOs, output: obj }));
+  const recOs = /firmware|bare-?metal|none|uefi|freestanding/i.test(targetOs) ? "linux" : targetOs;
+  const rec = await trace("poa.recompile", { irPath: bc, targetArch, targetOs: recOs, output: obj },
+    await call("poa.recompile", { irPath: bc, targetArch, targetOs: recOs, output: obj }));
   report.details.recompile = rec;
   if (rec.ok) report.artifacts.push({ path: obj, kind: "relocatable-object", verified: false });
   outcome = rec.ok
-    ? "FREESTANDING LIFT+RECOMPILE: IR and object produced. Runnable status requires target startup code + poa.verify (not yet performed)."
+    ? "FREESTANDING LIFT+RECOMPILE: IR and object produced. For a runnable target binary, use the verified host-shim path in scripts/m3-e2e-convert.mjs (works for syscall-free code)."
     : `LIFT/RECOMPILE BLOCKED: ${rec.blocker?.what ?? "unknown"}`;
 } else {
   outcome = `REFUSED (no runnable conversion): ${assessment.verdict?.bestHonestOutcome ?? "rung blocked"}`;

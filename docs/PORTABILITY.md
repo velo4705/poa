@@ -30,6 +30,27 @@ The verdict reports `stopAtRung` (the first decisive rung), `bestHonestOutcome`,
 is true only for same-platform artifacts, pinned-source rebuilds, and firmware targets with
 correct startup — never for a lifted GUI binary.
 
+## Verified conversion (the "possible" end, proved)
+
+`scripts/m3-e2e-convert.mjs` is a complete **agent-driven** conversion using POA tools:
+
+```
+x86-64 function (4 bytes) → poa.lift (range) → LLVM IR (2 intrinsics)
+                          → poa.recompile → aarch64 ELF object
+                          → fixed-argv zig link with a 20-line host shim
+                          → qemu-aarch64: rc=0, converted code computed 42+42=84
+```
+
+Run it with `nix develop --command node scripts/m3-e2e-convert.mjs`. The report lands in
+`.poa/conversions/m3-e2e-conversion.json`; the shim's two Remill intrinsics and x86 State
+offsets (RSP 2312, RDI 2296, RAX 2216) come from Remill's X86 `State.h` and were validated
+against the generated IR GEPs. This is a **real, verified binary→other-ISA port** — not
+emulation of the original OS, and not a fake artifact.
+
+Scope limit, stated honestly: this works for **syscall-free, OS-import-free code**. A
+GUI binary needs hundreds of intrinsics, the source OS ABI, and a replacement UI — which is
+why rungs 5–6 remain blocked/impossible. Do not generalize the shim.
+
 ## Verified walk-through (the four shapes of input)
 
 | Input | Result |
