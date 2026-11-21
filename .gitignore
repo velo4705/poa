@@ -43,3 +43,5 @@ test-poa.zip
 
 # User-local MCP config — example file is committed
 opencode.json
+
+*.core
