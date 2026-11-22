@@ -35,6 +35,7 @@ import { liftBinary, recompileFromIr } from "./lift.js";
 import { goBuildInfo, verifyEmbeddedAssets, extractDotnet } from "./extract.js";
 import { assessPortability } from "./assess.js";
 import { decompileNative } from "./decompile.js";
+import { convertWpfToAvalonia } from "./convert.js";
 import {
   getSession,
   saveSession,
@@ -771,6 +772,26 @@ server.registerTool(
       ...(maxFunctions !== undefined ? { maxFunctions } : {}),
     });
     await appendLog(rootDir, { tool: "poa.decompile_native", ok: r.ok, functions: r.functions });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Source conversion (M3)
+
+server.registerTool(
+  "poa.convert_wpf_to_avalonia",
+  {
+    title: "Convert decompiled WPF C# source to an Avalonia project skeleton",
+    description:
+      "Copies a decompiled .NET/WPF project, maps System.Windows.* namespaces to Avalonia equivalents, injects generated source-level declarations for WPF-only types, and writes a net8.0 Avalonia entry point. This is a source-to-source STARTING POINT, not a completed port: BAML views are not recovered, stubs preserve signatures only, the native engine is untouched, and the build needs per-API repair. Run poa.build on the output for an honest error count.",
+    inputSchema: {
+      input: z.string().describe("Directory of decompiled WPF C# source"),
+      outputDir: z.string().describe("Directory to write the Avalonia port skeleton"),
+    },
+  },
+  locked("poa.convert_wpf_to_avalonia", async ({ input, outputDir }) => {
+    const r = await convertWpfToAvalonia({ input, outputDir });
+    await appendLog(rootDir, { tool: "poa.convert_wpf_to_avalonia", ok: r.ok, files: r.filesCopied });
     return json(r);
   }),
 );
