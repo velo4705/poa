@@ -86,3 +86,25 @@ achievable for this input, by any tool, today.** The achievable goals are:
 
 Binaries in this directory are not committed to git. Extracted decompiled source is not in the
 repository either, for the same reason.
+
+## Direct conversion attempts (2026-11-22)
+
+Three different mechanisms were tried against the extracted payload; none produced a runnable
+Linux equivalent. Measured evidence:
+
+1. **Lift the managed UI directly.** `poa.lift` on `EMP_MPP.exe` (1,052,512 bytes) succeeded,
+   but `poa.recompile` produced only a 4,760-byte ELF object with 8 undefined symbols: the PE
+   entry is a CLR stub, the real program is IL, not x86-64. `poa.assess_portability`: rung 6
+   `impossible` (WPF / WinForms).
+2. **Lift the native engine.** `EMP_MPPCore.dll` has a 1,795,676-byte `.text` and **632 imported
+   functions across 17 Windows DLLs** (KERNEL32, USER32, GDI32, gdiplus, WS2_32, WININET, …).
+   A 4 KB slice failed to lift with the installed i386 lifter; even if lifted, a native shim
+   would need hundreds of functions per module. Verdict: rung 5 `blocked`.
+3. **Retarget decompiled source to Linux.** 92 C# files / 28k lines rebuild for net462 Windows.
+   Retargeting to `net8.0` on Linux yields **2,020 compile errors** after fixing 58 decompiler
+   artifacts — overwhelmingly missing `System.Windows.*` WPF types. That is a UI rewrite, not
+   a port.
+
+No attempt produced a runnable binary, let alone one that looks the same. Unlike the tiny PE in
+`docs/PORTABILITY.md`, this artifact has no small import surface to implement. The remaining
+path is the rights-holder source workstream in `docs/PORT-EPSON-source.md`.
