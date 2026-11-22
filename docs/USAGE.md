@@ -33,6 +33,9 @@ For managed .NET inputs, `poa.extract_dotnet` recovers C# source from IL and emi
 Windows→Linux dependency map (P/Invoke calls, UI framework, platform services). It is
 the first step of a source-to-source port, never a complete port by itself.
 
+For native binaries, `poa.decompile_native` runs Ghidra headless to produce pseudo-C for
+selected functions. Treat the output as analysis evidence, not compilable port source.
+
 ## A new session, step by step
 
 ```text

@@ -97,6 +97,17 @@ AXAML, registry/COM/drivers → XDG/D-Bus/PipeWire. It is a starting point, not 
 native engine's source is not present in the managed assembly, and no compatible layer or
 third-party substitute binary is accepted in this project.
 
+## Native decompilation added (2026-11-22)
+
+`poa.decompile_native` now drives Ghidra headless and emits pseudo-C for selected functions.
+Verified on two payload DLLs: 40 internal functions from `EMP_FWSET.dll`, and 10 `MppApi_*`
+exports from `EMP_MPPCore.dll` through the POA tool itself (plus 30 exports in a direct run).
+The output is **Ghidra pseudo-C, not port source**: `undefined4`, `LOCK()/UNLOCK()`, vtables,
+and calls to undecompiled helpers. Only one of the first 40 decompiled functions was
+self-contained enough to compile without generated shims. The engine's ~1,600 exports and
+thousands of internal functions would need complete decompilation plus a generated
+compatibility layer and manual repair — still no kernel drivers or WPF UI.
+
 ## Direct conversion attempts (2026-11-22)
 
 Three different mechanisms were tried against the extracted payload; none produced a runnable

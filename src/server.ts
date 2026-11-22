@@ -34,6 +34,7 @@ import { buildPort, verifyPort } from "./build.js";
 import { liftBinary, recompileFromIr } from "./lift.js";
 import { goBuildInfo, verifyEmbeddedAssets, extractDotnet } from "./extract.js";
 import { assessPortability } from "./assess.js";
+import { decompileNative } from "./decompile.js";
 import {
   getSession,
   saveSession,
@@ -744,6 +745,32 @@ server.registerTool(
   locked("poa.extract_dotnet", async ({ input, outputDir }) => {
     const r = await extractDotnet({ input, outputDir });
     await appendLog(rootDir, { tool: "poa.extract_dotnet", ok: r.ok, files: r.sourceFiles, pinvokes: r.pinvokes.length });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Native decompilation (M3)
+
+server.registerTool(
+  "poa.decompile_native",
+  {
+    title: "Decompile native machine code to pseudo-C via Ghidra",
+    description:
+      "Runs Ghidra headless to decompile functions from a native binary into C. Honest limit: the result is Ghidra pseudo-C (undefined types, LOCK/UNLOCK macros, vtables, undecompiled helper calls) — NOT compilable port source without a compatibility header and human repair. Never claims a working port. Requires Ghidra + JDK 21+.",
+    inputSchema: {
+      input: z.string().describe("Native binary (PE/ELF/Mach-O) to decompile"),
+      outputDir: z.string().describe("Directory for generated pseudo-C and Ghidra project"),
+      filter: z.string().optional().describe("Only decompile functions whose names contain this substring"),
+      maxFunctions: z.number().int().min(1).max(2000).optional().describe("Max functions to decompile (default 40)"),
+    },
+  },
+  locked("poa.decompile_native", async ({ input, outputDir, filter, maxFunctions }) => {
+    const r = await decompileNative({
+      input, outputDir,
+      ...(filter !== undefined ? { filter } : {}),
+      ...(maxFunctions !== undefined ? { maxFunctions } : {}),
+    });
+    await appendLog(rootDir, { tool: "poa.decompile_native", ok: r.ok, functions: r.functions });
     return json(r);
   }),
 );
