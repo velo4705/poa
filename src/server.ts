@@ -32,7 +32,7 @@ import { chooseStrategy } from "./strategy.js";
 import { detectBuildSystem } from "./buildsystem.js";
 import { buildPort, verifyPort } from "./build.js";
 import { liftBinary, recompileFromIr } from "./lift.js";
-import { goBuildInfo, verifyEmbeddedAssets } from "./extract.js";
+import { goBuildInfo, verifyEmbeddedAssets, extractDotnet } from "./extract.js";
 import { assessPortability } from "./assess.js";
 import {
   getSession,
@@ -724,6 +724,26 @@ server.registerTool(
   locked("poa.verify_embedded_assets", async ({ input, referenceDir, output }) => {
     const r = await verifyEmbeddedAssets({ input, referenceDir, ...(output !== undefined ? { output } : {}) });
     await appendLog(rootDir, { tool: "poa.verify_embedded_assets", ok: r.ok, found: r.foundByteIdentical + r.foundCrlfNormalized, total: r.total });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Managed source extraction (M3)
+
+server.registerTool(
+  "poa.extract_dotnet",
+  {
+    title: "Recover C# source from a .NET assembly and map its Windows dependencies",
+    description:
+      "Uses ilspycmd to recover faithful C# from .NET IL (not machine code), then scans the source for P/Invoke imports and UI framework markers and returns a Windows→Linux dependency map. Writes the decompiled project into outputDir. Honest limits: BAML views need manual XAML retargeting, native P/Invoke targets are machine code, and no runnable Linux binary is produced. Requires ilspycmd on PATH.",
+    inputSchema: {
+      input: z.string().describe("Path to the managed .NET assembly (PE with CLR header)"),
+      outputDir: z.string().describe("Directory to write the decompiled C# project into"),
+    },
+  },
+  locked("poa.extract_dotnet", async ({ input, outputDir }) => {
+    const r = await extractDotnet({ input, outputDir });
+    await appendLog(rootDir, { tool: "poa.extract_dotnet", ok: r.ok, files: r.sourceFiles, pinvokes: r.pinvokes.length });
     return json(r);
   }),
 );

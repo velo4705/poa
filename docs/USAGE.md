@@ -29,6 +29,10 @@ same-platform → pinned source → IR/object → freestanding → OS ABI → ru
 and returns a machine-readable refusal of "magic lifts" with the exact rung where the
 road stops. Drive it from the CLI with `node scripts/assess.mjs <binary>`.
 
+For managed .NET inputs, `poa.extract_dotnet` recovers C# source from IL and emits a
+Windows→Linux dependency map (P/Invoke calls, UI framework, platform services). It is
+the first step of a source-to-source port, never a complete port by itself.
+
 ## A new session, step by step
 
 ```text

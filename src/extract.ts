@@ -269,3 +269,131 @@ export async function verifyEmbeddedAssets(opts: { input: string; referenceDir: 
   }
   return report;
 }
+
+/**
+ * poa.extract_dotnet — recover a .NET assembly's IL as compilable C# source
+ * and map its Windows-only dependencies to target-platform substitutes.
+ *
+ * This is source recovery, not a binary lift: .NET IL carries full type and
+ * member metadata, so a decompiler can reconstruct faithful C#. The output is
+ * a dependency map for the agent, NOT a runnable Linux port. BAML (compiled
+ * WPF XAML) and native P/Invoke targets still need a real port/rewrite.
+ */
+export interface DotnetPInvoke {
+  library: string;
+  count: number;
+  functions: string[];
+}
+
+export interface DependencyMapping {
+  windows: string;
+  linuxTarget: string;
+  note: string;
+}
+
+export interface DotnetExtraction {
+  ok: boolean;
+  input: string;
+  outputDir: string;
+  tool: string;
+  sourceFiles: number;
+  sourceLines: number;
+  pinvokes: DotnetPInvoke[];
+  uiFramework: "WPF" | "WinForms" | "unknown";
+  dependencyMap: DependencyMapping[];
+  notes: string[];
+  blocker?: { what: string; why: string; ask?: string };
+}
+
+export async function extractDotnet(opts: { input: string; outputDir: string }): Promise<DotnetExtraction> {
+  const input = path.resolve(opts.input);
+  const out = path.resolve(opts.outputDir);
+  const empty: DotnetExtraction = {
+    ok: false, input, outputDir: out, tool: "", sourceFiles: 0, sourceLines: 0,
+    pinvokes: [], uiFramework: "unknown", dependencyMap: [], notes: [],
+  };
+  const exists = await fs.access(input).then(() => true, () => false);
+  if (!exists) return { ...empty, blocker: { what: "no input file", why: `path not found: ${input}` } };
+  const tool = await whichOnPath("ilspycmd");
+  if (!tool) {
+    return { ...empty, blocker: {
+      what: "ilspycmd not on PATH",
+      why: "IL decompilation is required to recover C# source from a managed assembly",
+      ask: "Install ilspycmd (dotnet tool) or run inside a shell that provides it.",
+    } };
+  }
+
+  await fs.mkdir(out, { recursive: true });
+  const r = await run(tool, ["-p", "--nested-directories", "-o", out, input], 180_000);
+  if (r.code !== 0) {
+    return { ...empty, tool, blocker: {
+      what: "ilspycmd failed",
+      why: `ilspycmd exited with code ${r.code}`,
+    }, notes: [(r.out + "\n" + r.err).slice(-1000)] };
+  }
+
+  let sourceFiles = 0;
+  let sourceLines = 0;
+  let uiFramework: DotnetExtraction["uiFramework"] = "unknown";
+  const byLib = new Map<string, Set<string>>();
+  for await (const f of walkFiles(out)) {
+    if (!f.endsWith(".cs")) continue;
+    sourceFiles++;
+    const text = await fs.readFile(f, "utf8");
+    sourceLines += text.split("\n").length;
+    if (/PresentationFramework|System\.Windows\.Controls|System\.Windows\.Media/.test(text)) uiFramework = "WPF";
+    else if (uiFramework === "unknown" && /System\.Windows\.Forms/.test(text)) uiFramework = "WinForms";
+    const lines = text.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const dm = lines[i]!.match(/DllImport\(\s*"([^"]+)"/);
+      if (!dm) continue;
+      const lib = dm[1]!;
+      const next = (lines[i + 1] ?? "") + (lines[i + 2] ?? "");
+      const fn = next.match(/extern\s+[\w<>\[\],.]+\s+([A-Za-z_]\w*)\s*\(/);
+      if (!byLib.has(lib)) byLib.set(lib, new Set());
+      byLib.get(lib)!.add(fn?.[1] ?? "(unknown)");
+    }
+  }
+
+  const pinvokes = [...byLib.entries()]
+    .map(([library, fns]) => ({ library, functions: [...fns].sort(), count: fns.size }))
+    .sort((a, b) => b.count - a.count);
+
+  const dependencyMap: DependencyMapping[] = [
+    ...pinvokes.map((p) => ({
+      windows: p.library,
+      linuxTarget: /kernel32|user32|gdi32|advapi32|shell32|ole32|oleaut32|imm32|uxTheme/i.test(p.library)
+        ? "per-binary native Linux adapter implementing the used functions"
+        : /^EMP_|^eIC\.dll/i.test(p.library)
+          ? "Linux native engine port (C/C++ source required)"
+          : "audit each imported function; provide a Linux-native equivalent",
+      note: `${p.count} imported function(s)`,
+    })),
+    ...(uiFramework === "WPF" ? [{
+      windows: "WPF / PresentationFramework (BAML views)",
+      linuxTarget: "Avalonia AXAML rewrite",
+      note: "compiled BAML cannot run on Linux; XAML must be decompiled and retargeted manually",
+    }] : []),
+    ...(uiFramework === "WinForms" ? [{
+      windows: "System.Windows.Forms",
+      linuxTarget: "Avalonia or GTK rewrite",
+      note: "WinForms has no Linux implementation",
+    }] : []),
+    {
+      windows: "Windows registry / COM / WDF drivers",
+      linuxTarget: "XDG config / D-Bus / PipeWire+uhid",
+      note: "platform services need explicit adapters, never a binary shim",
+    },
+  ];
+
+  return {
+    ok: true, input, outputDir: out, tool, sourceFiles, sourceLines, pinvokes,
+    uiFramework, dependencyMap,
+    notes: [
+      "IL was recovered as C# source; this is NOT machine-code decompilation.",
+      "BAML views are compiled XAML and need a separate XAML decompilation + retargeting step.",
+      "Native P/Invoke targets are machine code; POA cannot recover their source from IL.",
+      "This tool produces source + a dependency map, NOT a runnable Linux binary.",
+    ],
+  };
+}

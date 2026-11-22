@@ -87,6 +87,16 @@ achievable for this input, by any tool, today.** The achievable goals are:
 Binaries in this directory are not committed to git. Extracted decompiled source is not in the
 repository either, for the same reason.
 
+## Source-recovery capability added (2026-11-22)
+
+`poa.extract_dotnet` now recovers a managed assembly's IL as faithful C# (ilspycmd) and emits a
+Windows→Linux dependency map. Run on `EMP_MPP.exe`: **92 files / 28,386 lines**, UI framework
+`WPF`, **303 P/Invoke imports** from `EMP_MPPCore.dll` plus user32/gdi32/SHELL32. That map is the
+input for a source-level port: Win32 imports → native Linux adapters, WPF/BAML → Avalonia
+AXAML, registry/COM/drivers → XDG/D-Bus/PipeWire. It is a starting point, not a port — the
+native engine's source is not present in the managed assembly, and no compatible layer or
+third-party substitute binary is accepted in this project.
+
 ## Direct conversion attempts (2026-11-22)
 
 Three different mechanisms were tried against the extracted payload; none produced a runnable
