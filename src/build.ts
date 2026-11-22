@@ -220,6 +220,27 @@ export async function buildPort(
   const buildDir = path.resolve(cwd, opts.buildDir ?? path.join(".poa", "build", session.id));
   await fs.mkdir(buildDir, { recursive: true });
 
+  // Managed .NET path: fixed argv `dotnet build` for csproj source trees.
+  // This builds the project as authored (framework target decides host OS).
+  const csprojs = (await fs.readdir(source)).filter((f) => f.toLowerCase().endsWith(".csproj"));
+  if (csprojs.length > 0) {
+    const dotnet = await whichMany(["dotnet", "dotnet-sdk"]);
+    if (!dotnet) {
+      return { ok: false, stage: "build", detail: "dotnet not found", blocker: { what: "dotnet SDK missing", why: "csproj source tree needs the .NET SDK", ask: "nix shell nixpkgs#dotnet-sdk_8" } };
+    }
+    const managedOut = path.join(buildDir, "dotnet");
+    const r = await run(dotnet, ["build", "-c", "Release", "-o", managedOut, csprojs[0]!], source, TIMEOUT_BUILD_MS,
+      { DOTNET_CLI_TELEMETRY_OPTOUT: "1", DOTNET_NOLOGO: "1" });
+    if (r.code !== 0) {
+      return { ok: false, stage: "build", detail: `dotnet build failed (exit ${r.code ?? "timeout"})`, logTail: tail(r.stdout + "\n" + r.stderr, 60) };
+    }
+    const artifacts: Array<{ path: string; arch: string }> = [];
+    for (const f of await fs.readdir(managedOut)) {
+      if (/\.(dll|exe)$/i.test(f)) artifacts.push({ path: path.join(managedOut, f), arch: target.arch });
+    }
+    return { ok: true, stage: "build", detail: `dotnet build succeeded (${csprojs[0]})`, artifacts, logTail: tail(r.stdout, 20) };
+  }
+
   // CMake path (preferred, best cross support). POA_CMAKE_SOURCE wins if set;
   // then the root, then the usual embedded-build locations (zstd: ./build/cmake).
   const CMAKE_CANDIDATE_DIRS = ["", "build/cmake", "cmake", "CMake", "build"];

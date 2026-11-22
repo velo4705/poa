@@ -26,6 +26,7 @@ const MARKERS: Array<{ file: string; system: string; confidence: number; cross: 
     { file: "autogen.sh", system: "autotools", confidence: 0.6, cross: "toolchain-file" },
     { file: "Cargo.toml", system: "cargo", confidence: 0.95, cross: "toolchain-file" },
     { file: "go.mod", system: "go", confidence: 0.95, cross: "toolchain-file" },
+    { file: "*.csproj", system: "dotnet", confidence: 0.9, cross: "native" },
     { file: "package.json", system: "npm", confidence: 0.8, cross: "native" },
     { file: "pyproject.toml", system: "python", confidence: 0.8, cross: "native" },
     { file: "pom.xml", system: "maven", confidence: 0.9, cross: "native" },
@@ -51,7 +52,8 @@ async function walk(root: string, depth: number, dir: string, hits: Map<string, 
       await walk(root, depth + 1, path.join(dir, e.name), hits);
       continue;
     }
-    const marker = MARKERS.find((m) => m.file === e.name);
+    const marker = MARKERS.find((m) => m.file === e.name
+      || (m.file.startsWith("*.") && e.name.toLowerCase().endsWith(m.file.slice(1).toLowerCase())));
     if (marker && !hits.has(marker.system)) {
       hits.set(marker.system, path.relative(root, path.join(dir, e.name)));
     }
