@@ -30,6 +30,30 @@ The verdict reports `stopAtRung` (the first decisive rung), `bestHonestOutcome`,
 is true only for same-platform artifacts, pinned-source rebuilds, and firmware targets with
 correct startup — never for a lifted GUI binary.
 
+## Verified Windows PE → Linux ELF conversion
+
+`scripts/m3-winpe-to-linux.mjs` extends the proof across OSes: it builds a 3 KB Win32 PE
+(`kernel32.dll` imports: `GetStdHandle`, `WriteFile`, `ExitProcess`, no CRT), lifts its 150-byte
+`.text` with `poa.lift`, recompiles with `poa.recompile`, and links against
+`scripts/m3/win32-shim.c` — a **per-binary, 3-function native implementation** of those imports.
+
+Result (verified, no Wine, no source):
+
+```
+Linux ELF: .poa/conversions/hello-from-winpe
+output:    "Hello from the M3 spike"   (the PE's own message)
+exit:      0
+```
+
+The shim maps the PE's flat address space, patches the IAT with Linux implementations,
+translates guest pointers, and honours Remill's return-in-RAX convention. It is deliberately
+**not** a compatibility layer: it knows exactly three imports and one binary layout. That is
+why it works here and why it cannot be mistaken for a general Windows→Linux converter —
+GUI apps with hundreds of imports/COM drivers remain blocked (rungs 5–6).
+
+Run with `nix develop --command node scripts/m3-winpe-to-linux.mjs`; report in
+`.poa/conversions/m3-winpe-to-linux.json`.
+
 ## Verified conversion (the "possible" end, proved)
 
 `scripts/m3-e2e-convert.mjs` is a complete **agent-driven** conversion using POA tools:
