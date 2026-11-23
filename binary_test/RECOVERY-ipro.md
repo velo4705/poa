@@ -108,6 +108,25 @@ self-contained enough to compile without generated shims. The engine's ~1,600 ex
 thousands of internal functions would need complete decompilation plus a generated
 compatibility layer and manual repair — still no kernel drivers or WPF UI.
 
+## Ported installer (verified 2026-11-23)
+
+`scripts/epson-installer/` is a **native Linux installer** for the Epson payload, built and tested
+through POA (`scripts/m3-eps-installer.mjs`: `poa.start_port` → `poa.detect_buildsystem` →
+`poa.build` → `poa.verify`). It replaces the Win32 bootstrapper with a GTK4 window (a different,
+Linux-native window style), extracts the MSI payload to `share/epson-iprojection-linux`, writes a
+`.desktop` entry and a launcher, and copies itself into `bin/`.
+
+Verified results:
+- POA build: succeeded (native ELF); POA verify: `outcome: passed`, exit 0.
+- Installation: **136 files** installed to the prefix, including 133 payload files + desktop entry + launcher.
+- GUI installer launched on the desktop: window `"Epson iProjection — Linux Installer"` (screenshot: `.poa/installer-gui.png`).
+- Launched app binary works: window `"Epson iProjection (Linux port)"` (screenshot: `.poa/app-gui.png`).
+
+Scope: the installer and launcher are genuine native Linux binaries. The **application GUI is a
+minimal GTK4 shell** — it opens and runs, but it does not reproduce the Windows WPF app's look or
+its projector-control behaviour (see the conversion limits above). No Wine or compatibility layer
+is used; GTK4 is the target-native toolkit.
+
 ## Direct conversion attempts (2026-11-22)
 
 Three different mechanisms were tried against the extracted payload; none produced a runnable
