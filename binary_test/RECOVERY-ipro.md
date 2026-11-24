@@ -122,6 +122,13 @@ Verified results:
 - GUI installer launched on the desktop: window `"Epson iProjection — Linux Installer"` (screenshot: `.poa/installer-gui.png`).
 - Launched app binary works: window `"Epson iProjection (Linux port)"` (screenshot: `.poa/app-gui.png`).
 
+**Functional engine added (2026-11-24):** the launcher binary now contains a native projector-control
+engine (POSIX sockets + PJLink/ESC-VP.net command family recovered from the payload strings, with
+MD5 password auth). POA build + verify pass against a local PJLink simulator: `--status` returned
+`POWER=0 INPUT=1 MUTE=0 LAMP=0 1234 NAME=POA Sim Projector`; power/mute commands returned `OK`.
+The GTK4 app window shows live projector status and has working Power/Mute buttons
+(screenshot: `.poa/app-engine-gui.png`). No Wine or compat layer is used.
+
 Scope: the installer and launcher are genuine native Linux binaries. The **application GUI is a
 minimal GTK4 shell** — it opens and runs, but it does not reproduce the Windows WPF app's look or
 its projector-control behaviour (see the conversion limits above). No Wine or compatibility layer

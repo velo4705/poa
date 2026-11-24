@@ -50,6 +50,12 @@ if (build.ok) {
   console.log("artifacts:", (build.artifacts ?? []).map((a) => a.path).join(" "));
   const v = await call("poa.verify", { args: ["--cli-install", payload, prefix], timeoutMs: 10000 });
   console.log("verify:", JSON.stringify(v).slice(0, 500));
+  // Verify the app engine against a local projector simulator.
+  const sim = spawn("python3", [path.resolve("scripts/epson-installer/simulator.py"), "14352"], { stdio: "ignore" });
+  await new Promise((r) => setTimeout(r, 1500));
+  const ev = await call("poa.verify", { args: ["--status", "127.0.0.1", "--port", "14352"], timeoutMs: 10000 });
+  console.log("engine verify:", JSON.stringify(ev).slice(0, 600));
+  sim.kill();
 }
 const exited = new Promise((r) => { server.once("exit", r); setTimeout(r, 5000); });
 server.kill(); await exited;
