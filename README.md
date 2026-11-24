@@ -18,6 +18,7 @@ target allows, with every loss explicit and documented — never hidden.
 
 ## What it will and won't do
 
+- ✅ Plan one input against **every target OS/arch** (`poa.port_matrix`) — see [Any OS → Any OS](docs/ANY-OS.md)
 - ✅ Port C/C++ **source** to another OS or architecture (same code, new build)
 - ✅ Cross-compile from Linux to Windows via a clean toolchain (`zig cc`)
 - ✅ Verify a port runs, using the target's own tests or a native/qemu smoke run

@@ -37,6 +37,7 @@ import { assessPortability } from "./assess.js";
 import { decompileNative } from "./decompile.js";
 import { convertWpfToAvalonia } from "./convert.js";
 import { nextAttempt } from "./motivation.js";
+import { portMatrix } from "./matrix.js";
 import {
   getSession,
   saveSession,
@@ -793,6 +794,26 @@ server.registerTool(
   locked("poa.convert_wpf_to_avalonia", async ({ input, outputDir }) => {
     const r = await convertWpfToAvalonia({ input, outputDir });
     await appendLog(rootDir, { tool: "poa.convert_wpf_to_avalonia", ok: r.ok, files: r.filesCopied });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Any OS → Any OS matrix
+
+server.registerTool(
+  "poa.port_matrix",
+  {
+    title: "Plan one input against every target OS/architecture",
+    description:
+      "The Any OS → Any OS planner. Ingests the input once and runs the real strategy ladder + discrepancy mapper for every registered target (or a specified subset). Each row states the strategy, fidelity tier, gap count, requirements and next steps. This is a plan, not a produced port: source + target adapters is the universal path; binary→binary remains a narrow declared exception.",
+    inputSchema: {
+      input: z.string().describe("Path to the source tree, binary, firmware image or WASM module"),
+      targets: z.array(z.string()).optional().describe("Target ids to include (default: all built-in + registered)"),
+    },
+  },
+  locked("poa.port_matrix", async ({ input, targets }) => {
+    const r = await portMatrix({ input, ...(targets !== undefined ? { targets } : {}), cwd: rootDir });
+    await appendLog(rootDir, { tool: "poa.port_matrix", ok: r.ok, rows: r.rows.length });
     return json(r);
   }),
 );
