@@ -108,6 +108,17 @@ self-contained enough to compile without generated shims. The engine's ~1,600 ex
 thousands of internal functions would need complete decompilation plus a generated
 compatibility layer and manual repair — still no kernel drivers or WPF UI.
 
+Visual reference attempt (2026-11-24): the only sanctioned way to see the original UI would be
+Wine as a **research tool** (`scripts/investigate-windows-ui.sh`, temporary prefix, never shipped).
+In this sandbox Wine is non-functional: even `wine --version` exits with `Bad system call (SIGSYS,
+core dumped)`. That is a genuine capability limit, so no original screenshot was obtainable here.
+The Linux port's look is therefore target-native GTK4 (screenshots `.poa/installer-gui.png`,
+`.poa/app-engine-gui.png`), deliberately not a pixel copy of the WPF UI. Control-level comparison
+from the recovered source: the Windows app has toolbar/dialog controls (`btn_Projection`,
+`btn_Delivery`, `btn_Pause`, `btn_OK`, `btn_Cancel`, update banner, panes); the Linux app exposes
+projector status plus power/mute controls. This is a **DEGRADED look and feature set**, declared here,
+not a silent substitution.
+
 ## Ported installer (verified 2026-11-23)
 
 `scripts/epson-installer/` is a **native Linux installer** for the Epson payload, built and tested
