@@ -122,6 +122,14 @@ Verified results:
 - GUI installer launched on the desktop: window `"Epson iProjection — Linux Installer"` (screenshot: `.poa/installer-gui.png`).
 - Launched app binary works: window `"Epson iProjection (Linux port)"` (screenshot: `.poa/app-gui.png`).
 
+Extraction logic recovered from the stub and reused by the Linux port:
+`strings` on `iProV410Win_Web.exe` shows `CDInst.cab`, `_cabs`, `SetupIterateCabinetA`
+(SETUPAPI.dll), and the three embedded payloads `InstDataX86|InstDataX64|InstDataARM64/Epson
+iProjection Ver.4.10.msi`. The native Linux installer performs the equivalent distribution step:
+it installs the 133 files extracted from the X86 MSI into `share/epson-iprojection-linux`, then
+writes a `.desktop` entry and launcher (136 files total) — the same payload, target-native paths
+instead of `C:\Program Files\...`. No Windows installer API is emulated.
+
 **Functional engine added (2026-11-24):** the launcher binary now contains a native projector-control
 engine (POSIX sockets + PJLink/ESC-VP.net command family recovered from the payload strings, with
 MD5 password auth). POA build + verify pass against a local PJLink simulator: `--status` returned
