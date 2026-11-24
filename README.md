@@ -22,6 +22,7 @@ target allows, with every loss explicit and documented — never hidden.
 - ✅ Cross-compile from Linux to Windows via a clean toolchain (`zig cc`)
 - ✅ Verify a port runs, using the target's own tests or a native/qemu smoke run
 - ✅ Report exactly what didn't make it, so humans decide what to chase
+- ✅ Keep trying: `poa.next_attempt` turns any blocker into three genuinely different next approaches ([motivation](docs/POA-MOTIVATION.md))
 - ✅ Lift a syscall-free binary function to another ISA and **run it there** (verified: x86-64 → aarch64 via `poa.lift` + `poa.recompile` + a small host shim)
 - ✅ Convert a small Windows PE (3 kernel32 imports) to a **running Linux ELF** via POA tools + a per-binary native shim — no Wine, no source
 - ❌ Lift a binary to a different platform by magic — POA refuses to pretend; `poa.assess_portability` shows exactly where the possible→impossible ladder stops

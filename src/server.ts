@@ -36,6 +36,7 @@ import { goBuildInfo, verifyEmbeddedAssets, extractDotnet } from "./extract.js";
 import { assessPortability } from "./assess.js";
 import { decompileNative } from "./decompile.js";
 import { convertWpfToAvalonia } from "./convert.js";
+import { nextAttempt } from "./motivation.js";
 import {
   getSession,
   saveSession,
@@ -792,6 +793,27 @@ server.registerTool(
   locked("poa.convert_wpf_to_avalonia", async ({ input, outputDir }) => {
     const r = await convertWpfToAvalonia({ input, outputDir });
     await appendLog(rootDir, { tool: "poa.convert_wpf_to_avalonia", ok: r.ok, files: r.filesCopied });
+    return json(r);
+  }),
+);
+
+// ----------------------------------------------------------- Never-stop motivation
+
+server.registerTool(
+  "poa.next_attempt",
+  {
+    title: "Generate the next genuinely different porting attempt",
+    description:
+      "Never-stop loop for POA: given a goal and a precise blocker, reframe it and return at least three genuinely different mechanisms (decompose, change representation, search prior art, remove an assumption, minimal experiment, change tool, analogy) with the smallest verifiable step and the evidence that would prove success. Declares honest stop conditions only for missing rights/permission, explicit user constraints, proven physical limits, or irreversible actions.",
+    inputSchema: {
+      goal: z.string().describe("Porting goal, e.g. 'run this Epson app natively on Linux'"),
+      blocker: z.string().describe("Exact observed blocker, not a vague 'impossible'"),
+      tried: z.array(z.string()).optional().describe("Approaches already tried, to avoid repeating them"),
+    },
+  },
+  locked("poa.next_attempt", async ({ goal, blocker, tried }) => {
+    const r = nextAttempt({ goal, blocker, ...(tried !== undefined ? { tried } : {}) });
+    await appendLog(rootDir, { tool: "poa.next_attempt", attempts: r.attempts.length });
     return json(r);
   }),
 );
